@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Students | Bookful{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <h1 class="h4">Add Student</h1>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control") }}
+            {% for err in form.name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.grade.label(class="form-label") }}
+            {{ form.grade(class="form-control") }}
+            {% for err in form.grade.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          {{ form.submit(class="btn btn-primary w-100") }}
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <h2 class="h4">Your Students</h2>
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead><tr><th>Name</th><th>Grade</th></tr></thead>
+        <tbody>
+          {% for student in students %}
+            <tr>
+              <td>{{ student.name }}</td>
+              <td>{{ student.grade or '-' }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="2" class="text-center text-muted">No students yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

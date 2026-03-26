@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Checkout History | Bookful{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Checkout History</h1>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-3 align-items-end">
+      <div class="col-md-4">
+        {{ form.student_id.label(class="form-label") }}
+        {{ form.student_id(class="form-select") }}
+      </div>
+      <div class="col-md-4">
+        {{ form.book_id.label(class="form-label") }}
+        {{ form.book_id(class="form-select") }}
+      </div>
+      <div class="col-md-3">
+        {{ form.status.label(class="form-label") }}
+        {{ form.status(class="form-select") }}
+      </div>
+      <div class="col-md-1 d-grid">
+        <button class="btn btn-primary" type="submit">Go</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Book</th>
+        <th>Status</th>
+        <th>Checkout Date</th>
+        <th>Due Date</th>
+        <th>Return Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in records %}
+        <tr>
+          <td>{{ record.student.name }}</td>
+          <td>{{ record.book.title }} by {{ record.book.author }}</td>
+          <td>
+            {% if record.status == 'checked_out' %}
+              <span class="badge text-bg-warning">Active</span>
+            {% else %}
+              <span class="badge text-bg-success">Returned</span>
+            {% endif %}
+          </td>
+          <td>{{ record.checkout_date.strftime('%Y-%m-%d') }}</td>
+          <td>{{ record.due_date.strftime('%Y-%m-%d') if record.due_date else '-' }}</td>
+          <td>{{ record.return_date.strftime('%Y-%m-%d') if record.return_date else '-' }}</td>
+          <td class="text-end">
+            {% if record.status == 'checked_out' %}
+              <form method="post" action="{{ url_for('checkouts.mark_returned', record_id=record.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-outline-success">Mark as Returned</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7" class="text-center text-muted">No records found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

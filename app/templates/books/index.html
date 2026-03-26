@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Books | Bookful{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <h1 class="h4">Add Book</h1>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.title.label(class="form-label") }}
+            {{ form.title(class="form-control") }}
+            {% for err in form.title.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.author.label(class="form-label") }}
+            {{ form.author(class="form-control") }}
+            {% for err in form.author.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.isbn.label(class="form-label") }}
+            {{ form.isbn(class="form-control") }}
+            {% for err in form.isbn.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          {{ form.submit(class="btn btn-primary w-100") }}
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <h2 class="h4">Your Books</h2>
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead><tr><th>Title</th><th>Author</th><th>ISBN</th></tr></thead>
+        <tbody>
+          {% for book in books %}
+            <tr>
+              <td>{{ book.title }}</td>
+              <td>{{ book.author }}</td>
+              <td>{{ book.isbn or '-' }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="3" class="text-center text-muted">No books yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
