@@ -25,4 +25,8 @@ def create_app(config_object: str = "config.Config") -> Flask:
     app.register_blueprint(books_bp)
     app.register_blueprint(checkouts_bp)
 
+    # Safety net for first deploys where migrations were not run yet.
+    with app.app_context():
+        db.create_all()
+
     return app

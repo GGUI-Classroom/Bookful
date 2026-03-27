@@ -1,5 +1,6 @@
 from flask import flash, redirect, render_template, url_for
 from flask_login import current_user, login_required, login_user, logout_user
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.auth import auth_bp
 from app.extensions import db
@@ -30,7 +31,12 @@ def signup():
         teacher = Teacher(username=username, email=email)
         teacher.set_password(form.password.data)
         db.session.add(teacher)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            flash("We could not create your account right now. Please try again.", "danger")
+            return render_template("auth/signup.html", form=form)
 
         login_user(teacher)
         flash("Account created successfully.", "success")
