@@ -32,6 +32,9 @@ def _book_choices():
 @login_required
 def new_checkout():
     form = CheckoutForm()
+    # Set default checkout date on GET requests
+    if not form.is_submitted() and not form.checkout_date.data:
+        form.checkout_date.data = date.today()
     form.existing_student_id.choices = _student_choices()
     form.existing_book_id.choices = _book_choices()
 
