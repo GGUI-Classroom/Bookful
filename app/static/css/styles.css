@@ -34,3 +34,25 @@ body {
   background: #1559e6;
   border-color: #1559e6;
 }
+
+.btn-checkout {
+  background: linear-gradient(135deg, #58d5ff 0%, #1b66ff 100%);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.6rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(27, 102, 255, 0.3);
+  display: inline-block;
+  font-size: 0.95rem;
+}
+
+.btn-checkout:hover {
+  background: linear-gradient(135deg, #42c5ff 0%, #1559e6 100%);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(27, 102, 255, 0.45);
+  transform: translateY(-2px);
+  text-decoration: none;
+}

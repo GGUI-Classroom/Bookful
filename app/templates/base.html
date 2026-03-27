@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Bookful{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/bookful-logo.svg') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -26,11 +27,13 @@
             <li class="nav-item"><a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('students.index') }}">Students</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('books.index') }}">Books</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('checkouts.new_checkout') }}">New Checkout</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('checkouts.records') }}">Records</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
           </ul>
-          <span class="navbar-text text-white">{{ current_user.username }}</span>
+          <div class="d-flex gap-3 align-items-center ms-auto">
+            <a href="{{ url_for('checkouts.new_checkout') }}" class="btn btn-checkout">New Checkout</a>
+            <span class="navbar-text text-white">{{ current_user.username }}</span>
+          </div>
         {% else %}
           <ul class="navbar-nav ms-auto">
             <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a></li>
