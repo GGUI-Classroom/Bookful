@@ -12,6 +12,7 @@
             {{ form.title.label(class="form-label") }}
             {{ form.title(class="form-control") }}
             {% for err in form.title.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+            <div id="book-title-suggestions" class="list-group shadow-sm mt-2 d-none"></div>
           </div>
           <div class="mb-3">
             {{ form.author.label(class="form-label") }}
@@ -22,6 +23,12 @@
             {{ form.isbn.label(class="form-label") }}
             {{ form.isbn(class="form-control") }}
             {% for err in form.isbn.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          <div id="book-cover-wrap" class="mb-3 d-none">
+            <label class="form-label">Cover Preview</label>
+            <div>
+              <img id="book-cover-img" alt="Book cover preview" class="img-thumbnail" style="max-height: 180px;">
+            </div>
           </div>
           {{ form.submit(class="btn btn-primary w-100") }}
         </form>
@@ -55,4 +62,19 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/book_lookup.js') }}"></script>
+  <script>
+    initBookLookup({
+      endpoint: "{{ url_for('books.open_library_search') }}",
+      titleSelector: "#title",
+      authorSelector: "#author",
+      isbnSelector: "#isbn",
+      coverWrapSelector: "#book-cover-wrap",
+      coverImgSelector: "#book-cover-img",
+      suggestionsSelector: "#book-title-suggestions"
+    });
+  </script>
 {% endblock %}

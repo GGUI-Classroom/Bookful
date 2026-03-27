@@ -123,11 +123,14 @@ def records():
         query = query.filter(CheckoutRecord.status == "returned")
 
     records = query.all()
+    active_records = [record for record in records if record.status == "checked_out"]
+    previous_records = [record for record in records if record.status == "returned"]
 
     return render_template(
         "checkouts/records.html",
         form=form,
-        records=records,
+        active_records=active_records,
+        previous_records=previous_records,
         record_count=len(records),
     )
 

@@ -56,7 +56,11 @@
     <tbody>
       {% for record in active_checkouts %}
         <tr>
-          <td>{{ record.student.name }}</td>
+          <td>
+            <a class="link-primary fw-semibold text-decoration-none" href="{{ url_for('students.detail', student_id=record.student.id) }}">
+              {{ record.student.name }}
+            </a>
+          </td>
           <td>{{ record.book.title }} by {{ record.book.author }}</td>
           <td>{{ record.checkout_date.strftime('%Y-%m-%d') }}</td>
           <td>{{ record.due_date.strftime('%Y-%m-%d') if record.due_date else '-' }}</td>

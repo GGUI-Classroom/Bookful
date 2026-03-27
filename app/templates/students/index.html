@@ -33,7 +33,11 @@
         <tbody>
           {% for student in students %}
             <tr>
-              <td>{{ student.name }}</td>
+              <td>
+                <a class="link-primary fw-semibold text-decoration-none" href="{{ url_for('students.detail', student_id=student.id) }}">
+                  {{ student.name }}
+                </a>
+              </td>
             </tr>
           {% else %}
             <tr><td class="text-center text-muted">No students yet.</td></tr>
