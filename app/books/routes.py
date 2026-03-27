@@ -1,4 +1,4 @@
-from flask import flash, render_template
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app.books import books_bp
@@ -11,6 +11,7 @@ from app.models import Book
 @login_required
 def index():
     form = BookForm()
+    search_query = request.args.get("q", "").strip()
 
     if form.validate_on_submit():
         book = Book(
@@ -22,11 +23,21 @@ def index():
         db.session.add(book)
         db.session.commit()
         flash("Book added.", "success")
+        return redirect(url_for("books.index"))
 
-    books = (
-        Book.query.filter_by(teacher_id=current_user.id)
-        .order_by(Book.title.asc())
-        .all()
+    query = Book.query.filter_by(teacher_id=current_user.id)
+    if search_query:
+        query = query.filter(
+            (Book.title.ilike(f"%{search_query}%"))
+            | (Book.author.ilike(f"%{search_query}%"))
+            | (Book.isbn.ilike(f"%{search_query}%"))
+        )
+
+    books = query.order_by(Book.title.asc()).all()
+
+    return render_template(
+        "books/index.html",
+        form=form,
+        books=books,
+        search_query=search_query,
     )
-
-    return render_template("books/index.html", form=form, books=books)

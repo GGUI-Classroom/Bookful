@@ -21,11 +21,6 @@
             {{ form.new_student_name(class="form-control", placeholder="Type student name if not listed") }}
             {% for err in form.new_student_name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>
-          <div class="mb-3">
-            {{ form.new_student_grade.label(class="form-label") }}
-            {{ form.new_student_grade(class="form-control") }}
-            {% for err in form.new_student_grade.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-          </div>
         </div>
 
         <div class="col-lg-6">

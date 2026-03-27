@@ -1,12 +1,36 @@
 body {
-  background: #f6f8fb;
+  font-family: "Manrope", sans-serif;
+  background:
+    radial-gradient(1200px 400px at 0% -5%, rgba(52, 124, 255, 0.14), transparent 60%),
+    radial-gradient(900px 300px at 100% -10%, rgba(66, 214, 255, 0.12), transparent 65%),
+    #f6f8fb;
 }
 
 .card {
-  border-radius: 0.75rem;
+  border-radius: 0.9rem;
+  border: 1px solid #e8edf8;
 }
 
 .table td,
 .table th {
   vertical-align: middle;
+}
+
+.app-nav {
+  background: linear-gradient(90deg, #0d2f74 0%, #1a49a0 55%, #2672ff 100%);
+  box-shadow: 0 8px 30px rgba(10, 37, 88, 0.24);
+}
+
+.navbar-brand span {
+  letter-spacing: 0.2px;
+}
+
+.btn-primary {
+  background: #1b66ff;
+  border-color: #1b66ff;
+}
+
+.btn-primary:hover {
+  background: #1559e6;
+  border-color: #1559e6;
 }

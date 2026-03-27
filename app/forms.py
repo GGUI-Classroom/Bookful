@@ -24,7 +24,6 @@ class LoginForm(FlaskForm):
 
 class StudentForm(FlaskForm):
     name = StringField("Student Name", validators=[DataRequired(), Length(max=120)])
-    grade = StringField("Grade (Optional)", validators=[Optional(), Length(max=20)])
     submit = SubmitField("Add Student")
 
 
@@ -38,7 +37,6 @@ class BookForm(FlaskForm):
 class CheckoutForm(FlaskForm):
     existing_student_id = SelectField("Select Existing Student", coerce=int, default=0)
     new_student_name = StringField("Or Add New Student", validators=[Optional(), Length(max=120)])
-    new_student_grade = StringField("New Student Grade (Optional)", validators=[Optional(), Length(max=20)])
 
     existing_book_id = SelectField("Select Existing Book", coerce=int, default=0)
     new_book_title = StringField("Or Add New Book Title", validators=[Optional(), Length(max=255)])

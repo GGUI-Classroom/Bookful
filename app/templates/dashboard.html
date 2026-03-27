@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Dashboard | Bookful{% endblock %}
 {% block content %}
-<h1 class="h3 mb-4">Teacher Dashboard</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <h1 class="h3 mb-0">Teacher Dashboard</h1>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('students.index') }}">Add Student</a>
+    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('books.index') }}">Add Book</a>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('checkouts.new_checkout') }}">New Checkout</a>
+  </div>
+</div>
 
 <div class="row g-3 mb-4">
   <div class="col-md-4">
@@ -32,7 +39,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2 class="h5 mb-0">Currently Checked Out</h2>
-  <a class="btn btn-sm btn-primary" href="{{ url_for('checkouts.new_checkout') }}">Check Out a Book</a>
+  <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('checkouts.records') }}">View All Records</a>
 </div>
 
 <div class="table-responsive">

@@ -47,7 +47,7 @@ def new_checkout():
             student = Student(
                 teacher_id=current_user.id,
                 name=form.new_student_name.data.strip(),
-                grade=(form.new_student_grade.data or "").strip() or None,
+                grade=None,
             )
             db.session.add(student)
             db.session.flush()
@@ -86,9 +86,9 @@ def new_checkout():
     return render_template("checkouts/new.html", form=form)
 
 
-@checkouts_bp.get("/history")
+@checkouts_bp.get("/records")
 @login_required
-def history():
+def records():
     form = HistoryFilterForm(request.args)
 
     students = (
@@ -124,7 +124,18 @@ def history():
 
     records = query.all()
 
-    return render_template("checkouts/history.html", form=form, records=records)
+    return render_template(
+        "checkouts/records.html",
+        form=form,
+        records=records,
+        record_count=len(records),
+    )
+
+
+@checkouts_bp.get("/history")
+@login_required
+def history():
+    return redirect(url_for("checkouts.records"))
 
 
 @checkouts_bp.post("/<int:record_id>/return")
