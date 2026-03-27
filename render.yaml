@@ -17,6 +17,6 @@ services:
           name: bookful-db
           property: connectionString
       - key: SECRET_KEY
-        sync: false # Set real value in Render Dashboard -> Environment
+        sync: false
       - key: FLASK_ENV
         value: production
