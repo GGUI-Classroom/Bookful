@@ -5,7 +5,7 @@
 
 <div class="card shadow-sm">
   <div class="card-body">
-    <form method="post" novalidate>
+    <form method="post" novalidate id="new-checkout-form">
       {{ form.hidden_tag() }}
 
       <div class="row g-4">
@@ -68,17 +68,39 @@
   </div>
 </div>
 
+{% endblock %}
+
 {% block scripts %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("new-checkout-form");
     const checkoutDateInput = document.querySelector('[name="checkout_date"]');
     if (checkoutDateInput && !checkoutDateInput.value) {
       const today = new Date();
       const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const day = String(today.getDate()).padStart(2, '0');
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
       checkoutDateInput.value = `${year}-${month}-${day}`;
     }
+
+    if (!form || !checkoutDateInput) {
+      return;
+    }
+
+    form.addEventListener("submit", function (event) {
+      const selectedDate = checkoutDateInput.value;
+      const now = new Date();
+      const localToday = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
+      let message = `Create checkout with date ${selectedDate}?`;
+      if (selectedDate && selectedDate !== localToday) {
+        message = `Checkout date is ${selectedDate}, but your local date is ${localToday}.\n\nIf this is a timezone mismatch, click Cancel and update the checkout date before submitting.`;
+      }
+
+      if (!window.confirm(message)) {
+        event.preventDefault();
+      }
+    });
   });
 </script>
 {% endblock %}
