@@ -10,8 +10,31 @@
   </div>
 </div>
 
+{% if overdue_count > 0 %}
+<div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+  <h5 class="alert-heading d-flex align-items-center gap-2 mb-2">
+    <span style="font-size: 1.5rem;">⏰</span>
+    <strong>{{ overdue_count }} {{ 'Book' if overdue_count == 1 else 'Books' }} Overdue</strong>
+  </h5>
+  <p class="mb-2">The following books need attention:</p>
+  <ul class="mb-0">
+    {% for record in overdue_checkouts[:5] %}
+      <li>
+        <strong>{{ record.student.name }}</strong> has 
+        <em>{{ record.book.title }}</em> 
+        (due {{ record.due_date.strftime('%b %d, %Y') }})
+      </li>
+    {% endfor %}
+    {% if overdue_count > 5 %}
+      <li><em>and {{ overdue_count - 5 }} more...</em></li>
+    {% endif %}
+  </ul>
+  <a href="{{ url_for('checkouts.records') }}" class="btn btn-warning btn-sm mt-3">View All Overdue</a>
+</div>
+{% endif %}
+
 <div class="row g-3 mb-4">
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="card border-0 shadow-sm h-100">
       <div class="card-body">
         <h2 class="h6 text-muted">Students</h2>
@@ -19,7 +42,7 @@
       </div>
     </div>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="card border-0 shadow-sm h-100">
       <div class="card-body">
         <h2 class="h6 text-muted">Books</h2>
@@ -27,11 +50,19 @@
       </div>
     </div>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="card border-0 shadow-sm h-100">
       <div class="card-body">
         <h2 class="h6 text-muted">Active Checkouts</h2>
         <p class="display-6 mb-0">{{ active_checkout_count }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm h-100" style="{% if overdue_count > 0 %}border: 2px solid #fd7e14 !important;{% endif %}">
+      <div class="card-body">
+        <h2 class="h6 text-muted">Overdue</h2>
+        <p class="display-6 mb-0" style="{% if overdue_count > 0 %}color: #fd7e14; font-weight: 600;{% endif %}">{{ overdue_count }}</p>
       </div>
     </div>
   </div>
@@ -42,7 +73,7 @@
   <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('checkouts.records') }}">View All Records</a>
 </div>
 
-<div class="table-responsive">
+<div class="table-responsive mb-5">
   <table class="table table-striped align-middle">
     <thead>
       <tr>
@@ -77,4 +108,35 @@
     </tbody>
   </table>
 </div>
+
+{% if recent_returns %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h5 mb-0">📊 Recent Activity</h2>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-sm table-borderless align-middle">
+    <thead>
+      <tr class="border-bottom">
+        <th>Student</th>
+        <th>Book</th>
+        <th>Returned</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in recent_returns %}
+        <tr class="border-bottom" style="opacity: 0.8;">
+          <td>
+            <a class="link-secondary text-decoration-none" href="{{ url_for('students.detail', student_id=record.student.id) }}">
+              {{ record.student.name }}
+            </a>
+          </td>
+          <td><em>{{ record.book.title }}</em></td>
+          <td class="text-muted text-sm">{{ record.return_date.strftime('%b %d') }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
 {% endblock %}

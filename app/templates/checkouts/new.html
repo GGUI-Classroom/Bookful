@@ -34,7 +34,6 @@
             {{ form.new_book_title.label(class="form-label") }}
             {{ form.new_book_title(class="form-control", placeholder="Type title if not listed") }}
             {% for err in form.new_book_title.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-            <div id="checkout-book-suggestions" class="list-group shadow-sm mt-2 d-none"></div>
           </div>
           <div class="mb-3">
             {{ form.new_book_author.label(class="form-label") }}
@@ -45,12 +44,6 @@
             {{ form.new_book_isbn.label(class="form-label") }}
             {{ form.new_book_isbn(class="form-control") }}
             {% for err in form.new_book_isbn.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-          </div>
-          <div id="checkout-book-cover-wrap" class="mb-3 d-none">
-            <label class="form-label">Cover Preview</label>
-            <div>
-              <img id="checkout-book-cover-img" alt="Book cover preview" class="img-thumbnail" style="max-height: 180px;">
-            </div>
           </div>
         </div>
       </div>
@@ -74,19 +67,4 @@
     </form>
   </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-  <script src="{{ url_for('static', filename='js/book_lookup.js') }}"></script>
-  <script>
-    initBookLookup({
-      endpoint: "{{ url_for('books.open_library_search') }}",
-      titleSelector: "#new_book_title",
-      authorSelector: "#new_book_author",
-      isbnSelector: "#new_book_isbn",
-      coverWrapSelector: "#checkout-book-cover-wrap",
-      coverImgSelector: "#checkout-book-cover-img",
-      suggestionsSelector: "#checkout-book-suggestions"
-    });
-  </script>
 {% endblock %}

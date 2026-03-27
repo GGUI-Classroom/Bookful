@@ -1,3 +1,5 @@
+from datetime import date
+
 from flask import redirect, render_template, url_for
 from flask_login import current_user, login_required
 from sqlalchemy.orm import joinedload
@@ -23,6 +25,23 @@ def dashboard():
         status="checked_out",
     ).count()
 
+    # Calculate overdue checkouts
+    overdue_checkouts = (
+        CheckoutRecord.query.options(
+            joinedload(CheckoutRecord.student),
+            joinedload(CheckoutRecord.book),
+        )
+        .filter(
+            CheckoutRecord.teacher_id == current_user.id,
+            CheckoutRecord.status == "checked_out",
+            CheckoutRecord.due_date.isnot(None),
+            CheckoutRecord.due_date < date.today(),
+        )
+        .order_by(CheckoutRecord.due_date.asc())
+        .all()
+    )
+    overdue_count = len(overdue_checkouts)
+
     active_checkouts = (
         CheckoutRecord.query.options(
             joinedload(CheckoutRecord.student),
@@ -36,10 +55,28 @@ def dashboard():
         .all()
     )
 
+    # Get recent returns for activity summary (last 7 days)
+    recent_returns = (
+        CheckoutRecord.query.options(
+            joinedload(CheckoutRecord.student),
+            joinedload(CheckoutRecord.book),
+        )
+        .filter(
+            CheckoutRecord.teacher_id == current_user.id,
+            CheckoutRecord.status == "returned",
+        )
+        .order_by(CheckoutRecord.return_date.desc())
+        .limit(5)
+        .all()
+    )
+
     return render_template(
         "dashboard.html",
         student_count=student_count,
         book_count=book_count,
         active_checkout_count=active_checkout_count,
+        overdue_count=overdue_count,
+        overdue_checkouts=overdue_checkouts,
         active_checkouts=active_checkouts,
+        recent_returns=recent_returns,
     )
