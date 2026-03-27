@@ -43,7 +43,7 @@ class CheckoutForm(FlaskForm):
     new_book_author = StringField("New Book Author", validators=[Optional(), Length(max=255)])
     new_book_isbn = StringField("New Book ISBN (Optional)", validators=[Optional(), Length(max=50)])
 
-    checkout_date = DateField("Checkout Date", default=date.today, validators=[DataRequired()])
+    checkout_date = DateField("Checkout Date", validators=[DataRequired()])
     due_date = DateField("Due Date (Optional)", validators=[Optional()])
 
     submit = SubmitField("Create Checkout")
