@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Bookful | Classroom Library Tracker{% endblock %}
+{% block content %}
+<section class="landing-hero">
+  <div class="landing-orb landing-orb-1"></div>
+  <div class="landing-orb landing-orb-2"></div>
+
+  <div class="landing-hero-inner">
+    <div class="landing-copy">
+      <p class="landing-kicker">Built for Teachers</p>
+      <h1 class="landing-title">Run your classroom library without the chaos.</h1>
+      <p class="landing-subtitle">
+        Bookful helps you track who has what book, spot overdue checkouts fast,
+        and keep a clean history of returns so no book gets lost in the shuffle.
+      </p>
+      <div class="landing-actions">
+        <a class="btn btn-lg btn-landing-primary" href="{{ url_for('auth.signup') }}">Create Free Account</a>
+        <a class="btn btn-lg btn-landing-secondary" href="{{ url_for('auth.login') }}">Log In</a>
+      </div>
+    </div>
+
+    <div class="landing-panel card border-0 shadow-lg">
+      <div class="card-body p-4">
+        <h2 class="h4 mb-3">What Bookful Does</h2>
+        <ul class="landing-feature-list">
+          <li>
+            <strong>Checkouts in seconds</strong>
+            <span>Assign books to students with clear checkout and due dates.</span>
+          </li>
+          <li>
+            <strong>Overdue visibility</strong>
+            <span>See overdue books right on your dashboard before class starts.</span>
+          </li>
+          <li>
+            <strong>Student-by-student history</strong>
+            <span>Open any student profile to see active and previous books.</span>
+          </li>
+          <li>
+            <strong>Clean records</strong>
+            <span>Keep active checkouts and returned records separated automatically.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="landing-strip mt-4">
+  <div class="landing-strip-item">
+    <span class="landing-strip-number">1</span>
+    <p>Add students and books once.</p>
+  </div>
+  <div class="landing-strip-item">
+    <span class="landing-strip-number">2</span>
+    <p>Create and return checkouts in one click.</p>
+  </div>
+  <div class="landing-strip-item">
+    <span class="landing-strip-number">3</span>
+    <p>Use records to keep your library accountable.</p>
+  </div>
+</section>
+{% endblock %}

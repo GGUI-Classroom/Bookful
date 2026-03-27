@@ -12,7 +12,7 @@ from app.models import Book, CheckoutRecord, Student
 def home():
     if current_user.is_authenticated:
         return redirect(url_for("main.dashboard"))
-    return redirect(url_for("auth.login"))
+    return render_template("home.html")
 
 
 @main_bp.get("/dashboard")
