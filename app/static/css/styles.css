@@ -243,3 +243,82 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+.guide-hero {
+  border-radius: 1rem;
+  padding: 2rem 1.6rem;
+  background:
+    radial-gradient(900px 250px at 100% -20%, rgba(97, 220, 255, 0.24), transparent 65%),
+    linear-gradient(135deg, #0e2f72 0%, #1b57be 60%, #2d7fff 100%);
+  color: #fff;
+}
+
+.guide-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #9cefff;
+  margin-bottom: 0.55rem;
+}
+
+.guide-title {
+  font-size: clamp(1.7rem, 3.6vw, 2.8rem);
+  line-height: 1.1;
+  margin-bottom: 0.6rem;
+}
+
+.guide-subtitle {
+  margin: 0;
+  max-width: 60ch;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.guide-grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.guide-card {
+  border: 1px solid #d8e8ff;
+  border-radius: 0.9rem;
+  background: #fff;
+  padding: 1rem 1rem 0.95rem;
+}
+
+.guide-card h2 {
+  font-size: 1.08rem;
+  margin-bottom: 0.45rem;
+  color: #173b7f;
+}
+
+.guide-card p {
+  margin: 0;
+  color: #4c6188;
+}
+
+.guide-step {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #1c5fcc;
+  background: #e9f2ff;
+  border: 1px solid #cde1ff;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  margin-bottom: 0.55rem;
+}
+
+.guide-tip {
+  border-radius: 0.9rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
+}
+
+@media (max-width: 991.98px) {
+  .guide-grid {
+    grid-template-columns: 1fr;
+  }
+}

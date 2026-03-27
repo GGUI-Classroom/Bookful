@@ -15,6 +15,11 @@ def home():
     return render_template("home.html")
 
 
+@main_bp.get("/how-to-use")
+def how_to_use():
+    return render_template("how_to_use.html")
+
+
 @main_bp.get("/dashboard")
 @login_required
 def dashboard():

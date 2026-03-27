@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}How to Use | Bookful{% endblock %}
+{% block content %}
+<section class="guide-hero mb-4">
+  <p class="guide-kicker">How to Use Bookful</p>
+  <h1 class="guide-title">Classroom library management in 5 simple steps</h1>
+  <p class="guide-subtitle">
+    This page walks you through setup, daily checkout workflow, and how to stay on top of overdue books.
+  </p>
+</section>
+
+<section class="guide-grid mb-4">
+  <article class="guide-card">
+    <span class="guide-step">Step 1</span>
+    <h2>Create your starter list</h2>
+    <p>Go to Students and Books, then add your class and library collection once.</p>
+  </article>
+
+  <article class="guide-card">
+    <span class="guide-step">Step 2</span>
+    <h2>Create a checkout</h2>
+    <p>Click the New Checkout button, select student and book, set the checkout date, then confirm.</p>
+  </article>
+
+  <article class="guide-card">
+    <span class="guide-step">Step 3</span>
+    <h2>Review dashboard alerts</h2>
+    <p>Use the dashboard to spot overdue items and quickly see current classroom lending activity.</p>
+  </article>
+
+  <article class="guide-card">
+    <span class="guide-step">Step 4</span>
+    <h2>Mark returns immediately</h2>
+    <p>When books come back, use Mark as Returned so records stay accurate and current.</p>
+  </article>
+
+  <article class="guide-card">
+    <span class="guide-step">Step 5</span>
+    <h2>Use records for accountability</h2>
+    <p>Open Records to view active vs previous checkouts and track long-term borrowing patterns.</p>
+  </article>
+</section>
+
+<section class="guide-tip card border-0 shadow-sm">
+  <div class="card-body p-4">
+    <h2 class="h5 mb-2">Teacher Tip</h2>
+    <p class="mb-0">
+      If the checkout date does not match your local date, update it before confirming. Bookful asks for confirmation so you can catch timezone mismatches before saving.
+    </p>
+  </div>
+</section>
+
+<div class="d-flex flex-wrap gap-2 mt-4">
+  <a class="btn btn-primary" href="{{ url_for('auth.signup') }}">Start With Bookful</a>
+  <a class="btn btn-outline-primary" href="{{ url_for('main.home') }}">Back to Home</a>
+</div>
+{% endblock %}
