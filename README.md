@@ -17,14 +17,6 @@ pip install -r requirements.txt
 SECRET_KEY=replace-with-a-long-random-string
 DATABASE_URL=postgresql://username:password@host:5432/database_name
 FLASK_ENV=development
-CLASSLINK_ENABLED=false
-CLASSLINK_AUTHORIZE_URL=
-CLASSLINK_TOKEN_URL=
-CLASSLINK_USERINFO_URL=
-CLASSLINK_CLIENT_ID=
-CLASSLINK_CLIENT_SECRET=
-CLASSLINK_REDIRECT_URI=
-CLASSLINK_SCOPES=openid profile email
 ```
 
 4. Run migrations:
@@ -58,8 +50,6 @@ flask --app run.py db upgrade
 
 - `/auth/signup`
 - `/auth/login`
-- `/auth/classlink/login`
-- `/auth/classlink/callback`
 - `/dashboard`
 - `/classes/`
 - `/classes/join/<join_code>`

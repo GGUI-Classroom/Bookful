@@ -128,7 +128,8 @@ def edit(student_id: int):
     student = Student.query.filter_by(id=student_id, teacher_id=current_user.id).first_or_404()
     form = StudentForm(obj=student)
     form.classroom_id.choices = _classroom_choices()
-    form.classroom_id.data = student.classroom_id or 0
+    if request.method == "GET":
+        form.classroom_id.data = student.classroom_id or 0
     form.submit.label.text = "Update Student"
 
     if form.validate_on_submit():
