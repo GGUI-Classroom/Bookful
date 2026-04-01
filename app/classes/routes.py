@@ -41,4 +41,4 @@ def index():
 
 @classes_bp.get("/join/<string:join_code>")
 def join(join_code: str):
-    return redirect(url_for("portal.join", join_code=join_code))
+    return redirect(url_for("portal.choose_account", join_code=join_code))

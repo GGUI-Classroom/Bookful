@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Choose Account Type | Bookful{% endblock %}
+{% block content %}
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body py-3">
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+      <span class="badge text-bg-success">1. Class Code</span>
+      <span class="badge text-bg-primary">2. New or Old</span>
+      <span class="badge text-bg-light text-dark">3. Name and Password</span>
+    </div>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <p class="text-uppercase text-muted small mb-2">Class {{ classroom.name }}</p>
+        <h1 class="h3 mb-3">Choose your account type</h1>
+        <div class="d-grid gap-2">
+          <a class="btn btn-primary" href="{{ url_for('portal.new_account', join_code=classroom.join_code) }}">New Account</a>
+          <a class="btn btn-outline-secondary" href="{{ url_for('portal.old_account', join_code=classroom.join_code) }}">Old Account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

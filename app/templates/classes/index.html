@@ -20,9 +20,9 @@
 
     <div class="card shadow-sm mt-3">
       <div class="card-body">
-        <h2 class="h6">Student Account Portal</h2>
-        <p class="text-muted small mb-2">Students use the portal to join by class code, create a password, and later sign back in.</p>
-        <a class="btn btn-outline-primary btn-sm w-100" href="{{ url_for('portal.index') }}">Open Portal Home</a>
+        <h2 class="h6">Student Join Page</h2>
+        <p class="text-muted small mb-2">Students start on the home page with Join using class code and then choose New Account or Old Account.</p>
+        <a class="btn btn-outline-primary btn-sm w-100" href="{{ url_for('portal.join_with_code') }}">Open Join Page</a>
       </div>
     </div>
   </div>
@@ -46,8 +46,8 @@
               <td>{{ classroom.name }}</td>
               <td><code>{{ classroom.join_code }}</code></td>
               <td>
-                <a href="{{ url_for('portal.join', join_code=classroom.join_code) }}" target="_blank" rel="noreferrer">
-                  {{ url_for('portal.join', join_code=classroom.join_code, _external=True) }}
+                <a href="{{ url_for('portal.choose_account', join_code=classroom.join_code) }}" target="_blank" rel="noreferrer">
+                  {{ url_for('portal.choose_account', join_code=classroom.join_code, _external=True) }}
                 </a>
               </td>
             </tr>

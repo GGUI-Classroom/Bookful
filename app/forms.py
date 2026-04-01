@@ -54,22 +54,22 @@ class JoinClassForm(FlaskForm):
     submit = SubmitField("Join Class")
 
 
-class PortalJoinForm(FlaskForm):
-    student_name = StringField("Student Name", validators=[DataRequired(), Length(max=120)])
+class PortalCodeForm(FlaskForm):
+    join_code = StringField("Class Code", validators=[DataRequired(), Length(max=32)])
     submit = SubmitField("Continue")
 
 
-class PortalClaimForm(FlaskForm):
+class PortalNewAccountForm(FlaskForm):
+    student_name = StringField("Registered Student Name", validators=[DataRequired(), Length(max=120)])
     password = PasswordField("Create Password", validators=[DataRequired(), Length(min=8, max=128)])
     confirm_password = PasswordField(
         "Confirm Password",
         validators=[DataRequired(), EqualTo("password", message="Passwords must match.")],
     )
-    submit = SubmitField("Finish Setup")
+    submit = SubmitField("Create Account")
 
 
-class PortalLoginForm(FlaskForm):
-    join_code = StringField("Class Code", validators=[DataRequired(), Length(max=32)])
+class PortalOldAccountForm(FlaskForm):
     student_name = StringField("Student Name", validators=[DataRequired(), Length(max=120)])
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Sign In")
