@@ -18,6 +18,16 @@ def _current_student_account() -> StudentAccount | None:
     return db.session.get(StudentAccount, account_id)
 
 
+@portal_bp.app_context_processor
+def inject_student_portal_context():
+    account = _current_student_account()
+    return {
+        "student_portal_account": account,
+        "student_portal_student": account.student if account else None,
+        "student_portal_active": account is not None,
+    }
+
+
 def student_portal_required(view):
     @wraps(view)
     def wrapper(*args, **kwargs):
@@ -45,11 +55,18 @@ def _classroom_for_join_code(join_code: str) -> Classroom:
 
 @portal_bp.get("/")
 def index():
+    account = _current_student_account()
+    if account:
+        return redirect(url_for("portal.dashboard"))
     return redirect(url_for("portal.join_with_code"))
 
 
 @portal_bp.route("/join", methods=["GET", "POST"])
 def join_with_code():
+    if _current_student_account() is not None:
+        flash("You are already signed in.", "info")
+        return redirect(url_for("portal.dashboard"))
+
     form = PortalCodeForm()
 
     if form.validate_on_submit():
@@ -64,12 +81,20 @@ def join_with_code():
 
 @portal_bp.get("/join/<string:join_code>")
 def choose_account(join_code: str):
+    if _current_student_account() is not None:
+        flash("You are already signed in.", "info")
+        return redirect(url_for("portal.dashboard"))
+
     classroom = _classroom_for_join_code(join_code)
     return render_template("portal/choose_account.html", classroom=classroom)
 
 
 @portal_bp.route("/join/<string:join_code>/new", methods=["GET", "POST"])
 def new_account(join_code: str):
+    if _current_student_account() is not None:
+        flash("You are already signed in.", "info")
+        return redirect(url_for("portal.dashboard"))
+
     classroom = _classroom_for_join_code(join_code)
     form = PortalNewAccountForm()
 
@@ -99,6 +124,10 @@ def new_account(join_code: str):
 
 @portal_bp.route("/join/<string:join_code>/old", methods=["GET", "POST"])
 def old_account(join_code: str):
+    if _current_student_account() is not None:
+        flash("You are already signed in.", "info")
+        return redirect(url_for("portal.dashboard"))
+
     classroom = _classroom_for_join_code(join_code)
     form = PortalOldAccountForm()
 
