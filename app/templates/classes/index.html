@@ -11,7 +11,7 @@
           <div class="mb-3">
             {{ form.name.label(class="form-label") }}
             {{ form.name(class="form-control", placeholder="Reading Period 1") }}
-            <div class="form-text">This class name is shown to students during New Account and Old Account steps (for example, "Arvind Murthy's 2025-2026 Class").</div>
+            <div class="form-text">This class name is shown to students during New Account and Old Account steps (for example, "Ms. Lee's 2025-2026 Class").</div>
             {% for err in form.name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>
           {{ form.submit(class="btn btn-primary w-100") }}
