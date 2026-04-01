@@ -6,7 +6,10 @@
     <h1 class="h3 mb-0">{{ student.name }}</h1>
     <p class="text-muted mb-0">Student checkout activity</p>
   </div>
-  <a class="btn btn-outline-secondary" href="{{ url_for('students.index') }}">Back to Students</a>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{{ url_for('students.edit', student_id=student.id) }}">Edit Student</a>
+    <a class="btn btn-outline-secondary" href="{{ url_for('students.index') }}">Back to Students</a>
+  </div>
 </div>
 
 <div class="card shadow-sm mb-4">

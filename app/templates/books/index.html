@@ -39,16 +39,19 @@
     </div>
     <div class="table-responsive">
       <table class="table table-striped align-middle">
-        <thead><tr><th>Title</th><th>Author</th><th>ISBN</th></tr></thead>
+        <thead><tr><th>Title</th><th>Author</th><th>ISBN</th><th class="text-end">Actions</th></tr></thead>
         <tbody>
           {% for book in books %}
             <tr>
               <td>{{ book.title }}</td>
               <td>{{ book.author }}</td>
               <td>{{ book.isbn or '-' }}</td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('books.edit', book_id=book.id) }}">Edit</a>
+              </td>
             </tr>
           {% else %}
-            <tr><td colspan="3" class="text-center text-muted">No books yet.</td></tr>
+            <tr><td colspan="4" class="text-center text-muted">No books yet.</td></tr>
           {% endfor %}
         </tbody>
       </table>

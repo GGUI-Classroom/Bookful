@@ -39,6 +39,22 @@ def index():
     )
 
 
+@students_bp.route("/<int:student_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit(student_id: int):
+    student = Student.query.filter_by(id=student_id, teacher_id=current_user.id).first_or_404()
+    form = StudentForm(obj=student)
+    form.submit.label.text = "Update Student"
+
+    if form.validate_on_submit():
+        student.name = form.name.data.strip()
+        db.session.commit()
+        flash("Student updated.", "success")
+        return redirect(url_for("students.detail", student_id=student.id))
+
+    return render_template("students/edit.html", form=form, student=student)
+
+
 @students_bp.get("/<int:student_id>")
 @login_required
 def detail(student_id: int):

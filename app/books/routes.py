@@ -41,3 +41,21 @@ def index():
         books=books,
         search_query=search_query,
     )
+
+
+@books_bp.route("/<int:book_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit(book_id: int):
+    book = Book.query.filter_by(id=book_id, teacher_id=current_user.id).first_or_404()
+    form = BookForm(obj=book)
+    form.submit.label.text = "Update Book"
+
+    if form.validate_on_submit():
+        book.title = form.title.data.strip()
+        book.author = form.author.data.strip()
+        book.isbn = (form.isbn.data or "").strip() or None
+        db.session.commit()
+        flash("Book updated.", "success")
+        return redirect(url_for("books.index"))
+
+    return render_template("books/edit.html", form=form, book=book)

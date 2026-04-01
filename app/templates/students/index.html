@@ -29,7 +29,7 @@
     </div>
     <div class="table-responsive">
       <table class="table table-striped align-middle">
-        <thead><tr><th>Name</th></tr></thead>
+        <thead><tr><th>Name</th><th class="text-end">Actions</th></tr></thead>
         <tbody>
           {% for student in students %}
             <tr>
@@ -38,9 +38,12 @@
                   {{ student.name }}
                 </a>
               </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('students.edit', student_id=student.id) }}">Edit</a>
+              </td>
             </tr>
           {% else %}
-            <tr><td class="text-center text-muted">No students yet.</td></tr>
+            <tr><td colspan="2" class="text-center text-muted">No students yet.</td></tr>
           {% endfor %}
         </tbody>
       </table>
