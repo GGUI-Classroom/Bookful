@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Join Class | Bookful{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7 col-lg-5">
+    <h1 class="h3 mb-3">Join {{ classroom.name }}</h1>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <p class="text-muted">Enter your name to join this class.</p>
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          {{ form.join_code(type="hidden") }}
+          <div class="mb-3">
+            {{ form.student_name.label(class="form-label") }}
+            {{ form.student_name(class="form-control", placeholder="Arvind Murthy") }}
+            {% for err in form.student_name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.grade.label(class="form-label") }}
+            {{ form.grade(class="form-control", placeholder="5") }}
+            {% for err in form.grade.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          {{ form.submit(class="btn btn-primary w-100") }}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

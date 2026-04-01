@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Class Joined | Bookful{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h1 class="h4 mb-2">Joined {{ classroom.name }}</h1>
+        <p class="mb-1">Student: <strong>{{ student.name }}</strong></p>
+        {% if student.grade %}<p class="mb-1">Grade: <strong>{{ student.grade }}</strong></p>{% endif %}
+        <p class="mb-0 text-muted">
+          {% if already_joined %}
+            This student was already linked to the class.
+          {% else %}
+            Your name has been added to the class roster.
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

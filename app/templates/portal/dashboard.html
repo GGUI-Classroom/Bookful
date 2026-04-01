@@ -1,0 +1,99 @@
+{% extends "portal/base.html" %}
+{% block title %}My Checkouts | Bookful{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <p class="text-uppercase text-muted small mb-1">Account Portal</p>
+    <h1 class="h3 mb-0">{{ student.name }}</h1>
+    <p class="text-muted mb-0">{{ classroom.name if classroom else 'Student account' }}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('portal.collection') }}">Class Collection</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('portal.logout') }}">Logout</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <p class="text-muted mb-1">Active Checkouts</p>
+        <h2 class="display-6 mb-0">{{ active_checkouts|length }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <p class="text-muted mb-1">Past Returns</p>
+        <h2 class="display-6 mb-0">{{ previous_checkouts|length }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <p class="text-muted mb-1">Class Books</p>
+        <h2 class="display-6 mb-0">{{ books|length }}</h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h2 class="h5 mb-3">My Checkouts</h2>
+        <div class="table-responsive">
+          <table class="table table-striped align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Book</th>
+                <th>Due Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for record in active_checkouts %}
+                <tr>
+                  <td>{{ record.book.title }} by {{ record.book.author }}</td>
+                  <td>{{ record.due_date.strftime('%Y-%m-%d') if record.due_date else '-' }}</td>
+                </tr>
+              {% else %}
+                <tr><td colspan="2" class="text-center text-muted">No active checkouts.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Recent Returns</h2>
+        <div class="table-responsive">
+          <table class="table table-striped align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Book</th>
+                <th>Returned</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for record in previous_checkouts %}
+                <tr>
+                  <td>{{ record.book.title }} by {{ record.book.author }}</td>
+                  <td>{{ record.return_date.strftime('%Y-%m-%d') if record.return_date else '-' }}</td>
+                </tr>
+              {% else %}
+                <tr><td colspan="2" class="text-center text-muted">No returned books yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

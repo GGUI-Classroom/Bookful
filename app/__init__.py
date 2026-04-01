@@ -14,13 +14,17 @@ def create_app(config_object: str = "config.Config") -> Flask:
 
     from app import models  # noqa: F401
     from app.auth import auth_bp
+    from app.classes import classes_bp
     from app.books import books_bp
     from app.checkouts import checkouts_bp
     from app.main import main_bp
+    from app.portal import portal_bp
     from app.students import students_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
+    app.register_blueprint(classes_bp)
+    app.register_blueprint(portal_bp)
     app.register_blueprint(students_bp)
     app.register_blueprint(books_bp)
     app.register_blueprint(checkouts_bp)

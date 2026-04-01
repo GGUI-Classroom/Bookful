@@ -1,0 +1,46 @@
+{% extends "portal/base.html" %}
+{% block title %}Class Collection | Bookful{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <p class="text-uppercase text-muted small mb-1">Account Portal</p>
+    <h1 class="h3 mb-0">Class Collection</h1>
+    <p class="text-muted mb-0">{{ classroom.name if classroom else 'Your class library' }}</p>
+  </div>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('portal.dashboard') }}">Back to My Checkouts</a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-striped align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for book in books %}
+            {% set active = active_by_book_id.get(book.id) %}
+            <tr>
+              <td>{{ book.title }}</td>
+              <td>{{ book.author }}</td>
+              <td>
+                {% if active %}
+                  <span class="badge text-bg-warning">Checked out</span>
+                {% else %}
+                  <span class="badge text-bg-success">Available</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="3" class="text-center text-muted">No books in this class yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

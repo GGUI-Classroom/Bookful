@@ -25,6 +25,8 @@
         {% if current_user.is_authenticated %}
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item"><a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('portal.index') }}">Account Portal</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('classes.index') }}">Classes</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('students.index') }}">Students</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('books.index') }}">Books</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('checkouts.records') }}">Records</a></li>
@@ -37,6 +39,7 @@
           </div>
         {% else %}
           <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('portal.index') }}">Account Portal</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('main.how_to_use') }}">How to Use</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.signup') }}">Sign Up</a></li>

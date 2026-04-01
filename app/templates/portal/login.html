@@ -1,0 +1,34 @@
+{% extends "portal/base.html" %}
+{% block title %}Student Sign In | Bookful{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <p class="text-uppercase text-muted small mb-2">Student Sign In</p>
+        <h1 class="h3 mb-2">Return to your account</h1>
+        <p class="text-muted mb-3">Use your class code, name, and password.</p>
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.join_code.label(class="form-label") }}
+            {{ form.join_code(class="form-control", placeholder="AB12CD34") }}
+            {% for err in form.join_code.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.student_name.label(class="form-label") }}
+            {{ form.student_name(class="form-control", placeholder="Arvind Murthy") }}
+            {% for err in form.student_name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control") }}
+            {% for err in form.password.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          {{ form.submit(class="btn btn-primary w-100") }}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

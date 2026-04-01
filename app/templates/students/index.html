@@ -3,9 +3,10 @@
 {% block content %}
 <div class="row g-4">
   <div class="col-lg-4">
-    <h1 class="h4">Add Student</h1>
-    <div class="card shadow-sm">
+    <h1 class="h4">Account Portal Setup</h1>
+    <div class="card shadow-sm mb-3">
       <div class="card-body">
+        <h2 class="h6">Add a Student Manually</h2>
         <form method="post" novalidate>
           {{ form.hidden_tag() }}
           <div class="mb-3">
@@ -13,7 +14,38 @@
             {{ form.name(class="form-control") }}
             {% for err in form.name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>
+          <div class="mb-3">
+            {{ form.classroom_id.label(class="form-label") }}
+            {{ form.classroom_id(class="form-select") }}
+            {% for err in form.classroom_id.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
           {{ form.submit(class="btn btn-primary w-100") }}
+        </form>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="h6">Import a Roster</h2>
+        <p class="text-muted small mb-3">Paste names one per line or upload a CSV/text file. Existing names are skipped.</p>
+        <form method="post" action="{{ url_for('students.import_roster') }}" enctype="multipart/form-data" novalidate>
+          {{ roster_form.hidden_tag() }}
+          <div class="mb-3">
+            {{ roster_form.classroom_id.label(class="form-label") }}
+            {{ roster_form.classroom_id(class="form-select") }}
+            {% for err in roster_form.classroom_id.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ roster_form.roster_text.label(class="form-label") }}
+            {{ roster_form.roster_text(class="form-control", rows="4", placeholder="Arvind Murthy\nMia Lopez") }}
+            {% for err in roster_form.roster_text.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ roster_form.roster_file.label(class="form-label") }}
+            {{ roster_form.roster_file(class="form-control") }}
+            {% for err in roster_form.roster_file.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          {{ roster_form.submit(class="btn btn-outline-primary w-100") }}
         </form>
       </div>
     </div>
@@ -29,7 +61,7 @@
     </div>
     <div class="table-responsive">
       <table class="table table-striped align-middle">
-        <thead><tr><th>Name</th><th class="text-end">Actions</th></tr></thead>
+        <thead><tr><th>Name</th><th>Class</th><th class="text-end">Actions</th></tr></thead>
         <tbody>
           {% for student in students %}
             <tr>
@@ -38,12 +70,20 @@
                   {{ student.name }}
                 </a>
               </td>
+              <td>
+                {{ student.classroom.name if student.classroom else '-' }}
+                {% if student.account %}
+                  <span class="badge text-bg-success ms-2">Portal account</span>
+                {% else %}
+                  <span class="badge text-bg-secondary ms-2">No account yet</span>
+                {% endif %}
+              </td>
               <td class="text-end">
                 <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('students.edit', student_id=student.id) }}">Edit</a>
               </td>
             </tr>
           {% else %}
-            <tr><td colspan="2" class="text-center text-muted">No students yet.</td></tr>
+            <tr><td colspan="3" class="text-center text-muted">No students yet.</td></tr>
           {% endfor %}
         </tbody>
       </table>

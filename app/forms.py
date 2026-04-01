@@ -1,7 +1,7 @@
 from datetime import date
 
 from flask_wtf import FlaskForm
-from wtforms import DateField, PasswordField, SelectField, StringField, SubmitField
+from wtforms import DateField, FileField, PasswordField, SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, ValidationError
 
 
@@ -24,7 +24,15 @@ class LoginForm(FlaskForm):
 
 class StudentForm(FlaskForm):
     name = StringField("Student Name", validators=[DataRequired(), Length(max=120)])
+    classroom_id = SelectField("Classroom", coerce=int, default=0)
     submit = SubmitField("Add Student")
+
+
+class RosterImportForm(FlaskForm):
+    classroom_id = SelectField("Classroom", coerce=int, default=0)
+    roster_text = TextAreaField("Roster Names (one per line or CSV rows)", validators=[Optional(), Length(max=10000)])
+    roster_file = FileField("Roster CSV or TXT", validators=[Optional()])
+    submit = SubmitField("Import Roster")
 
 
 class BookForm(FlaskForm):
@@ -32,6 +40,45 @@ class BookForm(FlaskForm):
     author = StringField("Author", validators=[DataRequired(), Length(max=255)])
     isbn = StringField("ISBN (Optional)", validators=[Optional(), Length(max=50)])
     submit = SubmitField("Add Book")
+
+
+class ClassroomForm(FlaskForm):
+    name = StringField("Class Name", validators=[DataRequired(), Length(max=120)])
+    submit = SubmitField("Create Class")
+
+
+class JoinClassForm(FlaskForm):
+    join_code = StringField("Class Code", validators=[DataRequired(), Length(max=32)])
+    student_name = StringField("Student Name", validators=[DataRequired(), Length(max=120)])
+    grade = StringField("Grade (Optional)", validators=[Optional(), Length(max=20)])
+    submit = SubmitField("Join Class")
+
+
+class PortalJoinForm(FlaskForm):
+    student_name = StringField("Student Name", validators=[DataRequired(), Length(max=120)])
+    submit = SubmitField("Continue")
+
+
+class PortalClaimForm(FlaskForm):
+    password = PasswordField("Create Password", validators=[DataRequired(), Length(min=8, max=128)])
+    confirm_password = PasswordField(
+        "Confirm Password",
+        validators=[DataRequired(), EqualTo("password", message="Passwords must match.")],
+    )
+    submit = SubmitField("Finish Setup")
+
+
+class PortalLoginForm(FlaskForm):
+    join_code = StringField("Class Code", validators=[DataRequired(), Length(max=32)])
+    student_name = StringField("Student Name", validators=[DataRequired(), Length(max=120)])
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField("Sign In")
+
+
+class RecordImportForm(FlaskForm):
+    classroom_id = SelectField("Classroom", coerce=int, default=0)
+    records_file = FileField("CSV File", validators=[DataRequired()])
+    submit = SubmitField("Import Records")
 
 
 class CheckoutForm(FlaskForm):

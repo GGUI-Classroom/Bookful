@@ -20,6 +20,11 @@
             {{ form.name(class="form-control") }}
             {% for err in form.name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>
+          <div class="mb-3">
+            {{ form.classroom_id.label(class="form-label") }}
+            {{ form.classroom_id(class="form-select") }}
+            {% for err in form.classroom_id.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
           {{ form.submit(class="btn btn-primary w-100") }}
         </form>
       </div>

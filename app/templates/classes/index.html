@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Classes | Bookful{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <h1 class="h4">Create Class</h1>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control", placeholder="Reading Period 1") }}
+            {% for err in form.name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          {{ form.submit(class="btn btn-primary w-100") }}
+        </form>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-body">
+        <h2 class="h6">Student Account Portal</h2>
+        <p class="text-muted small mb-2">Students use the portal to join by class code, create a password, and later sign back in.</p>
+        <a class="btn btn-outline-primary btn-sm w-100" href="{{ url_for('portal.index') }}">Open Portal Home</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+      <h2 class="h4 mb-0">Your Classes</h2>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Join Code</th>
+            <th>Student Portal Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for classroom in classrooms %}
+            <tr>
+              <td>{{ classroom.name }}</td>
+              <td><code>{{ classroom.join_code }}</code></td>
+              <td>
+                <a href="{{ url_for('portal.join', join_code=classroom.join_code) }}" target="_blank" rel="noreferrer">
+                  {{ url_for('portal.join', join_code=classroom.join_code, _external=True) }}
+                </a>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="3" class="text-center text-muted">No classes yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

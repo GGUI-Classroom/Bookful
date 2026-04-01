@@ -6,7 +6,10 @@
     <h1 class="h3 mb-0">Checkout Records</h1>
     <p class="text-muted mb-0">{{ record_count }} record{{ '' if record_count == 1 else 's' }} found</p>
   </div>
-  <a class="btn btn-primary" href="{{ url_for('checkouts.new_checkout') }}">New Checkout</a>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{{ url_for('checkouts.import_records') }}">Import Records</a>
+    <a class="btn btn-primary" href="{{ url_for('checkouts.new_checkout') }}">New Checkout</a>
+  </div>
 </div>
 
 <div class="card shadow-sm mb-4">
