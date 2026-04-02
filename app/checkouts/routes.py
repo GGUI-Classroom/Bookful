@@ -47,6 +47,16 @@ def _parse_date(value: str | None):
     return None
 
 
+def _normalize_csv_row(row: dict[str, str]) -> dict[str, str]:
+    normalized: dict[str, str] = {}
+    for key, value in row.items():
+        if key is None:
+            continue
+        clean_key = key.strip().casefold().replace("\ufeff", "")
+        normalized[clean_key] = (value or "").strip()
+    return normalized
+
+
 @checkouts_bp.route("/new", methods=["GET", "POST"])
 @login_required
 def new_checkout():
@@ -174,11 +184,13 @@ def import_records():
     if form.validate_on_submit():
         classroom_id = form.classroom_id.data or None
 
-        students_query = Student.query.filter_by(teacher_id=current_user.id)
+        students_query = Student.query.filter_by(teacher_id=current_user.id, is_archived=False)
         if classroom_id:
             students_query = students_query.filter_by(classroom_id=classroom_id)
         students = students_query.all()
-        books = Book.query.filter_by(teacher_id=current_user.id).all()
+        books = Book.query.filter_by(teacher_id=current_user.id, is_archived=False).all()
+        classrooms = Classroom.query.filter_by(teacher_id=current_user.id).all()
+        classrooms_by_name = {classroom.name.casefold(): classroom for classroom in classrooms}
 
         raw_text = form.records_file.data.read().decode("utf-8", errors="ignore")
         rows = list(csv.DictReader(StringIO(raw_text)))
@@ -189,21 +201,56 @@ def import_records():
         imported_count = 0
         skipped_rows: list[dict[str, str]] = []
 
-        for row in rows:
-            student_name = (row.get("student_name") or row.get("student") or row.get("name") or "").strip()
-            book_title = (row.get("book_title") or row.get("title") or "").strip()
-            book_isbn = (row.get("isbn") or row.get("book_isbn") or "").strip() or None
+        for raw_row in rows:
+            row = _normalize_csv_row(raw_row)
+
+            student_name = row.get("student_name") or row.get("student") or row.get("name") or ""
+            book_title = row.get("book_title") or row.get("title") or ""
+            book_author = row.get("book_author") or row.get("author") or ""
+            book_isbn = row.get("isbn") or row.get("book_isbn") or None
+            row_class_name = row.get("class_name") or ""
             checkout_date = _parse_date(row.get("checkout_date")) or date.today()
             due_date = _parse_date(row.get("due_date"))
             return_date = _parse_date(row.get("return_date"))
             status = (row.get("status") or "checked_out").strip().lower() or "checked_out"
 
+            if not student_name or not book_title:
+                skipped_rows.append({"student_name": student_name, "book_title": book_title})
+                continue
+
+            effective_classroom_id = classroom_id
+            if effective_classroom_id is None and row_class_name:
+                classroom = classrooms_by_name.get(row_class_name.casefold())
+                if classroom is not None:
+                    effective_classroom_id = classroom.id
+
             student, _student_score = find_best_name_match(student_name, students, lambda item: item.name, minimum_score=0.78)
             book, _book_score = find_best_book_match(book_title, books, lambda item, field: getattr(item, field), isbn=book_isbn)
 
-            if student is None or book is None:
-                skipped_rows.append({"student_name": student_name, "book_title": book_title})
-                continue
+            if student is None:
+                student = Student(
+                    teacher_id=current_user.id,
+                    name=student_name,
+                    classroom_id=effective_classroom_id,
+                )
+                db.session.add(student)
+                db.session.flush()
+                students.append(student)
+
+            if book is None:
+                if not book_author:
+                    skipped_rows.append({"student_name": student_name, "book_title": book_title})
+                    continue
+
+                book = Book(
+                    teacher_id=current_user.id,
+                    title=book_title,
+                    author=book_author,
+                    isbn=(book_isbn or "").strip() or None,
+                )
+                db.session.add(book)
+                db.session.flush()
+                books.append(book)
 
             existing_record = CheckoutRecord.query.filter_by(
                 teacher_id=current_user.id,
