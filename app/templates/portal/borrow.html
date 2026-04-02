@@ -7,7 +7,7 @@
       <div>
         <p class="text-uppercase text-muted small mb-1">Account Portal</p>
         <h1 class="h3 mb-0">Borrow a Book</h1>
-        <p class="text-muted mb-0">Choose one book. Bookful will set the due date to 14 days from today.</p>
+        <p class="text-muted mb-0">Choose one book. Bookful will set the due date to {{ classroom.default_self_checkout_days }} day{{ '' if classroom.default_self_checkout_days == 1 else 's' }} from today.</p>
       </div>
       <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('portal.dashboard') }}">Back to My Checkouts</a>
     </div>
@@ -22,7 +22,7 @@
             {% for err in form.book_id.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>
           <div class="alert alert-info mb-3">
-            Due date is automatically set to 14 days from today when you borrow the book.
+            Due date is automatically set to {{ classroom.default_self_checkout_days }} day{{ '' if classroom.default_self_checkout_days == 1 else 's' }} from today when you borrow the book.
           </div>
           {{ form.submit(class="btn btn-primary") }}
         </form>

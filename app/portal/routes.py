@@ -284,7 +284,7 @@ def borrow():
             student_id=student.id,
             book_id=book.id,
             checkout_date=date.today(),
-            due_date=date.today() + timedelta(days=14),
+            due_date=date.today() + timedelta(days=classroom.default_self_checkout_days or 14),
             status="checked_out",
         )
         db.session.add(record)

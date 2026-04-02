@@ -1,8 +1,8 @@
 from datetime import date
 
 from flask_wtf import FlaskForm
-from wtforms import DateField, FileField, PasswordField, SelectField, StringField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, ValidationError
+from wtforms import DateField, FileField, IntegerField, PasswordField, SelectField, StringField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange, Optional, ValidationError
 
 
 class SignUpForm(FlaskForm):
@@ -44,6 +44,11 @@ class BookForm(FlaskForm):
 
 class ClassroomForm(FlaskForm):
     name = StringField("Class Name", validators=[DataRequired(), Length(max=120)])
+    default_self_checkout_days = IntegerField(
+        "Self-Checkout Due In (Days)",
+        validators=[DataRequired(), NumberRange(min=1, max=3650)],
+        default=14,
+    )
     submit = SubmitField("Create Class")
 
 

@@ -14,6 +14,12 @@
             <div class="form-text">This class name is shown to students during New Account and Old Account steps (for example, "Ms. Lee's 2025-2026 Class").</div>
             {% for err in form.name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>
+          <div class="mb-3">
+            {{ form.default_self_checkout_days.label(class="form-label") }}
+            {{ form.default_self_checkout_days(class="form-control", min="1", step="1") }}
+            <div class="form-text">Used only when student self-checkout is enabled.</div>
+            {% for err in form.default_self_checkout_days.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
           {{ form.submit(class="btn btn-primary w-100") }}
         </form>
       </div>
@@ -38,7 +44,7 @@
           <tr>
             <th>Name</th>
             <th>Join Code</th>
-            <th>Student Checkouts</th>
+            <th>Self-Checkout Settings</th>
             <th>Student Portal Link</th>
           </tr>
         </thead>
@@ -48,15 +54,24 @@
               <td>{{ classroom.name }}</td>
               <td><code>{{ classroom.join_code }}</code></td>
               <td>
-                <form method="post" action="{{ url_for('classes.toggle_student_checkouts', classroom_id=classroom.id) }}" class="d-inline">
+                <form method="post" action="{{ url_for('classes.update_settings', classroom_id=classroom.id) }}" class="d-flex flex-column gap-2">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  {% if classroom.allow_student_checkouts %}
-                    <span class="badge text-bg-success me-2">Enabled</span>
-                    <button class="btn btn-sm btn-outline-secondary" type="submit">Disable</button>
-                  {% else %}
-                    <span class="badge text-bg-secondary me-2">Teacher only</span>
-                    <button class="btn btn-sm btn-outline-primary" type="submit">Enable</button>
-                  {% endif %}
+                  <div class="form-check form-switch mb-0">
+                    <input class="form-check-input" type="checkbox" role="switch" id="self-checkout-{{ classroom.id }}" name="allow_student_checkouts" {% if classroom.allow_student_checkouts %}checked{% endif %}>
+                    <label class="form-check-label" for="self-checkout-{{ classroom.id }}">
+                      {% if classroom.allow_student_checkouts %}
+                        Enabled
+                      {% else %}
+                        Teacher only
+                      {% endif %}
+                    </label>
+                  </div>
+                  <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <label class="form-label mb-0 small text-muted" for="due-days-{{ classroom.id }}">Due in</label>
+                    <input id="due-days-{{ classroom.id }}" class="form-control form-control-sm" type="number" name="default_self_checkout_days" min="1" step="1" value="{{ classroom.default_self_checkout_days }}" style="width: 6rem;">
+                    <span class="small text-muted">days</span>
+                    <button class="btn btn-sm btn-outline-primary ms-auto" type="submit">Save</button>
+                  </div>
                 </form>
               </td>
               <td>

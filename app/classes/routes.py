@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import secrets
 
-from flask import flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app.classes import classes_bp
@@ -30,6 +30,7 @@ def index():
             teacher_id=current_user.id,
             name=form.name.data.strip(),
             join_code=_generate_join_code(),
+            default_self_checkout_days=form.default_self_checkout_days.data or 14,
         )
         db.session.add(classroom)
         db.session.commit()
@@ -39,15 +40,32 @@ def index():
     return render_template("classes/index.html", form=form, classrooms=classrooms)
 
 
-@classes_bp.post("/<int:classroom_id>/toggle-student-checkouts")
+@classes_bp.post("/<int:classroom_id>/settings")
 @login_required
-def toggle_student_checkouts(classroom_id: int):
+def update_settings(classroom_id: int):
     classroom = Classroom.query.filter_by(id=classroom_id, teacher_id=current_user.id).first_or_404()
-    classroom.allow_student_checkouts = not classroom.allow_student_checkouts
+
+    classroom.allow_student_checkouts = request.form.get("allow_student_checkouts") == "on"
+
+    due_days_raw = (request.form.get("default_self_checkout_days") or "").strip()
+    try:
+        due_days = int(due_days_raw)
+    except ValueError:
+        flash("Enter a valid number of days for self-checkout due dates.", "danger")
+        return redirect(url_for("classes.index"))
+
+    if due_days < 1:
+        flash("Self-checkout due days must be at least 1.", "danger")
+        return redirect(url_for("classes.index"))
+
+    classroom.default_self_checkout_days = due_days
     db.session.commit()
 
     state = "enabled" if classroom.allow_student_checkouts else "disabled"
-    flash(f"Student self-checkouts {state} for {classroom.name}.", "success")
+    flash(
+        f"Student self-checkouts {state} for {classroom.name}; due date set to {classroom.default_self_checkout_days} day{'s' if classroom.default_self_checkout_days != 1 else ''}.",
+        "success",
+    )
     return redirect(url_for("classes.index"))
 
 

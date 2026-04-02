@@ -36,6 +36,10 @@ def _ensure_schema_compatibility() -> None:
                     f"ALTER TABLE classroom ADD COLUMN allow_student_checkouts BOOLEAN NOT NULL DEFAULT {boolean_default}"
                 )
             )
+        if "default_self_checkout_days" not in classroom_columns:
+            db.session.execute(
+                text("ALTER TABLE classroom ADD COLUMN default_self_checkout_days INTEGER NOT NULL DEFAULT 14")
+            )
 
     if "student" in tables:
         student_columns = {column["name"] for column in inspector.get_columns("student")}
