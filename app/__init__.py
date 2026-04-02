@@ -7,6 +7,9 @@ from app.models import Classroom, StudentAccount
 
 def _ensure_schema_compatibility() -> None:
     inspector = inspect(db.engine)
+    dialect = db.engine.dialect.name
+    timestamp_type = "DATETIME" if dialect == "sqlite" else "TIMESTAMP"
+    boolean_default = "0" if dialect == "sqlite" else "FALSE"
     tables = set(inspector.get_table_names())
 
     # Add new teacher auth columns for older databases.
@@ -30,16 +33,24 @@ def _ensure_schema_compatibility() -> None:
         if "classroom_id" not in student_columns:
             db.session.execute(text("ALTER TABLE student ADD COLUMN classroom_id INTEGER"))
         if "is_archived" not in student_columns:
-            db.session.execute(text("ALTER TABLE student ADD COLUMN is_archived BOOLEAN NOT NULL DEFAULT 0"))
+            db.session.execute(
+                text(
+                    f"ALTER TABLE student ADD COLUMN is_archived BOOLEAN NOT NULL DEFAULT {boolean_default}"
+                )
+            )
         if "archived_at" not in student_columns:
-            db.session.execute(text("ALTER TABLE student ADD COLUMN archived_at DATETIME"))
+            db.session.execute(text(f"ALTER TABLE student ADD COLUMN archived_at {timestamp_type}"))
 
     if "book" in tables:
         book_columns = {column["name"] for column in inspector.get_columns("book")}
         if "is_archived" not in book_columns:
-            db.session.execute(text("ALTER TABLE book ADD COLUMN is_archived BOOLEAN NOT NULL DEFAULT 0"))
+            db.session.execute(
+                text(
+                    f"ALTER TABLE book ADD COLUMN is_archived BOOLEAN NOT NULL DEFAULT {boolean_default}"
+                )
+            )
         if "archived_at" not in book_columns:
-            db.session.execute(text("ALTER TABLE book ADD COLUMN archived_at DATETIME"))
+            db.session.execute(text(f"ALTER TABLE book ADD COLUMN archived_at {timestamp_type}"))
 
     if "student_account" not in tables:
         StudentAccount.__table__.create(bind=db.engine, checkfirst=True)
