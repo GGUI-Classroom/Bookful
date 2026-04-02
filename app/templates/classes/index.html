@@ -38,6 +38,7 @@
           <tr>
             <th>Name</th>
             <th>Join Code</th>
+            <th>Student Checkouts</th>
             <th>Student Portal Link</th>
           </tr>
         </thead>
@@ -47,13 +48,25 @@
               <td>{{ classroom.name }}</td>
               <td><code>{{ classroom.join_code }}</code></td>
               <td>
+                <form method="post" action="{{ url_for('classes.toggle_student_checkouts', classroom_id=classroom.id) }}" class="d-inline">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  {% if classroom.allow_student_checkouts %}
+                    <span class="badge text-bg-success me-2">Enabled</span>
+                    <button class="btn btn-sm btn-outline-secondary" type="submit">Disable</button>
+                  {% else %}
+                    <span class="badge text-bg-secondary me-2">Teacher only</span>
+                    <button class="btn btn-sm btn-outline-primary" type="submit">Enable</button>
+                  {% endif %}
+                </form>
+              </td>
+              <td>
                 <a href="{{ url_for('portal.choose_account', join_code=classroom.join_code) }}" target="_blank" rel="noreferrer">
                   {{ url_for('portal.choose_account', join_code=classroom.join_code, _external=True) }}
                 </a>
               </td>
             </tr>
           {% else %}
-            <tr><td colspan="3" class="text-center text-muted">No classes yet.</td></tr>
+            <tr><td colspan="4" class="text-center text-muted">No classes yet.</td></tr>
           {% endfor %}
         </tbody>
       </table>

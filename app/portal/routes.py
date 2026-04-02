@@ -1,11 +1,11 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from functools import wraps
 
 from flask import flash, redirect, render_template, request, session, url_for
 from sqlalchemy.orm import joinedload
 
 from app.extensions import db
-from app.forms import PortalCodeForm, PortalNewAccountForm, PortalOldAccountForm
+from app.forms import PortalCodeForm, PortalNewAccountForm, PortalOldAccountForm, StudentBorrowForm
 from app.models import Book, CheckoutRecord, Classroom, Student, StudentAccount
 from app.portal import portal_bp
 from app.utils.matching import find_best_name_match
@@ -21,9 +21,12 @@ def _current_student_account() -> StudentAccount | None:
 @portal_bp.app_context_processor
 def inject_student_portal_context():
     account = _current_student_account()
+    classroom = account.student.classroom if account else None
     return {
         "student_portal_account": account,
         "student_portal_student": account.student if account else None,
+        "student_portal_classroom": classroom,
+        "student_portal_can_self_checkout": bool(classroom and classroom.allow_student_checkouts),
         "student_portal_active": account is not None,
     }
 
@@ -156,6 +159,7 @@ def old_account(join_code: str):
 def dashboard():
     account = _current_student_account()
     student = account.student
+    classroom = student.classroom
 
     active_checkouts = (
         CheckoutRecord.query.options(joinedload(CheckoutRecord.book))
@@ -184,14 +188,18 @@ def dashboard():
         .all()
     )
 
+    borrow_form = StudentBorrowForm()
+    borrow_form.book_id.choices = _available_book_choices(student.teacher_id)
+
     return render_template(
         "portal/dashboard.html",
         student=student,
         account=account,
-        classroom=student.classroom,
+        classroom=classroom,
         active_checkouts=active_checkouts,
         previous_checkouts=previous_checkouts,
         books=books,
+        borrow_form=borrow_form,
     )
 
 
@@ -217,6 +225,74 @@ def collection():
         books=books,
         active_by_book_id=active_by_book_id,
     )
+
+
+def _available_book_choices(teacher_id: int):
+    books = (
+        Book.query.filter_by(teacher_id=teacher_id, is_archived=False)
+        .order_by(Book.title.asc())
+        .all()
+    )
+    return [(0, "-- Select a book --")] + [(book.id, f"{book.title} by {book.author}") for book in books]
+
+
+@portal_bp.route("/borrow", methods=["GET", "POST"])
+@student_portal_required
+def borrow():
+    account = _current_student_account()
+    student = account.student
+    classroom = student.classroom
+
+    if classroom is None or not classroom.allow_student_checkouts:
+        flash("Student self-checkouts are not enabled for your class.", "warning")
+        return redirect(url_for("portal.dashboard"))
+
+    form = StudentBorrowForm()
+    form.book_id.choices = _available_book_choices(student.teacher_id)
+
+    if form.validate_on_submit():
+        book = Book.query.filter_by(
+            id=form.book_id.data,
+            teacher_id=student.teacher_id,
+            is_archived=False,
+        ).first()
+        if book is None:
+            flash("Choose a valid book from the class collection.", "danger")
+            return render_template("portal/borrow.html", form=form, classroom=classroom, student=student)
+
+        active_record = CheckoutRecord.query.filter_by(
+            teacher_id=student.teacher_id,
+            student_id=student.id,
+            book_id=book.id,
+            status="checked_out",
+        ).first()
+        if active_record is not None:
+            flash("You already have that book checked out.", "warning")
+            return render_template("portal/borrow.html", form=form, classroom=classroom, student=student)
+
+        book_checked_out = CheckoutRecord.query.filter_by(
+            teacher_id=student.teacher_id,
+            book_id=book.id,
+            status="checked_out",
+        ).first()
+        if book_checked_out is not None:
+            flash("That book is currently checked out.", "warning")
+            return render_template("portal/borrow.html", form=form, classroom=classroom, student=student)
+
+        record = CheckoutRecord(
+            teacher_id=student.teacher_id,
+            student_id=student.id,
+            book_id=book.id,
+            checkout_date=date.today(),
+            due_date=date.today() + timedelta(days=14),
+            status="checked_out",
+        )
+        db.session.add(record)
+        db.session.commit()
+        flash("Book checked out.", "success")
+        return redirect(url_for("portal.dashboard"))
+
+    return render_template("portal/borrow.html", form=form, classroom=classroom, student=student)
 
 
 @portal_bp.get("/logout")

@@ -41,6 +41,7 @@ class Classroom(db.Model):
     teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"), nullable=False, index=True)
     name = db.Column(db.String(120), nullable=False)
     join_code = db.Column(db.String(32), unique=True, nullable=False, index=True)
+    allow_student_checkouts = db.Column(db.Boolean, nullable=False, default=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     students = db.relationship("Student", backref="classroom", lazy="dynamic")

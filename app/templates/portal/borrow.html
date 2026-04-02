@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Borrow Book | Bookful{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+      <div>
+        <p class="text-uppercase text-muted small mb-1">Account Portal</p>
+        <h1 class="h3 mb-0">Borrow a Book</h1>
+        <p class="text-muted mb-0">Choose one book. Bookful will set the due date to 14 days from today.</p>
+      </div>
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('portal.dashboard') }}">Back to My Checkouts</a>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.book_id.label(class="form-label") }}
+            {{ form.book_id(class="form-select") }}
+            {% for err in form.book_id.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          <div class="alert alert-info mb-3">
+            Due date is automatically set to 14 days from today when you borrow the book.
+          </div>
+          {{ form.submit(class="btn btn-primary") }}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

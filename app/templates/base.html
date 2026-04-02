@@ -26,6 +26,9 @@
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item"><a class="nav-link" href="{{ url_for('portal.dashboard') }}">My Checkouts</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('portal.collection') }}">Class Collection</a></li>
+            {% if student_portal_can_self_checkout %}
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('portal.borrow') }}">Borrow Book</a></li>
+            {% endif %}
             <li class="nav-item"><a class="nav-link" href="{{ url_for('portal.logout') }}">Logout</a></li>
           </ul>
           <div class="d-flex gap-3 align-items-center ms-auto">

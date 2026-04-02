@@ -39,6 +39,18 @@ def index():
     return render_template("classes/index.html", form=form, classrooms=classrooms)
 
 
+@classes_bp.post("/<int:classroom_id>/toggle-student-checkouts")
+@login_required
+def toggle_student_checkouts(classroom_id: int):
+    classroom = Classroom.query.filter_by(id=classroom_id, teacher_id=current_user.id).first_or_404()
+    classroom.allow_student_checkouts = not classroom.allow_student_checkouts
+    db.session.commit()
+
+    state = "enabled" if classroom.allow_student_checkouts else "disabled"
+    flash(f"Student self-checkouts {state} for {classroom.name}.", "success")
+    return redirect(url_for("classes.index"))
+
+
 @classes_bp.get("/join/<string:join_code>")
 def join(join_code: str):
     return redirect(url_for("portal.choose_account", join_code=join_code))

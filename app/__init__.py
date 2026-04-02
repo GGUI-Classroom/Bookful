@@ -28,6 +28,13 @@ def _ensure_schema_compatibility() -> None:
     inspector = inspect(db.engine)
     tables = set(inspector.get_table_names())
 
+    if "classroom" in tables:
+        classroom_columns = {column["name"] for column in inspector.get_columns("classroom")}
+        if "allow_student_checkouts" not in classroom_columns:
+            db.session.execute(
+                text("ALTER TABLE classroom ADD COLUMN allow_student_checkouts BOOLEAN NOT NULL DEFAULT 0")
+            )
+
     if "student" in tables:
         student_columns = {column["name"] for column in inspector.get_columns("student")}
         if "classroom_id" not in student_columns:

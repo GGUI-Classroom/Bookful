@@ -75,6 +75,11 @@ class PortalOldAccountForm(FlaskForm):
     submit = SubmitField("Sign In")
 
 
+class StudentBorrowForm(FlaskForm):
+    book_id = SelectField("Book", coerce=int, default=0)
+    submit = SubmitField("Borrow Book")
+
+
 class RecordImportForm(FlaskForm):
     classroom_id = SelectField("Classroom", coerce=int, default=0)
     records_file = FileField("CSV File", validators=[DataRequired()])
