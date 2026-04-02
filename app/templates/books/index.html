@@ -47,7 +47,13 @@
               <td>{{ book.author }}</td>
               <td>{{ book.isbn or '-' }}</td>
               <td class="text-end">
-                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('books.edit', book_id=book.id) }}">Edit</a>
+                <div class="d-inline-flex gap-1">
+                  <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('books.edit', book_id=book.id) }}">Edit</a>
+                  <form method="post" action="{{ url_for('books.delete', book_id=book.id) }}" onsubmit="return confirm('Delete this book? Previous records will remain.')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                  </form>
+                </div>
               </td>
             </tr>
           {% else %}

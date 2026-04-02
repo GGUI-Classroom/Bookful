@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy.orm import joinedload
@@ -54,7 +56,7 @@ def index():
         flash("Student added.", "success")
         return redirect(url_for("students.index"))
 
-    query = Student.query.filter_by(teacher_id=current_user.id)
+    query = Student.query.filter_by(teacher_id=current_user.id, is_archived=False)
     if search_query:
         query = query.filter(Student.name.ilike(f"%{search_query}%"))
 
@@ -93,7 +95,11 @@ def import_roster():
 
     existing_names = {
         normalize_name(student.name)
-        for student in Student.query.filter_by(teacher_id=current_user.id, classroom_id=classroom_id).all()
+        for student in Student.query.filter_by(
+            teacher_id=current_user.id,
+            classroom_id=classroom_id,
+            is_archived=False,
+        ).all()
     }
 
     created_count = 0
@@ -177,3 +183,24 @@ def detail(student_id: int):
         active_records=active_records,
         previous_records=previous_records,
     )
+
+
+@students_bp.post("/<int:student_id>/delete")
+@login_required
+def delete(student_id: int):
+    student = Student.query.filter_by(id=student_id, teacher_id=current_user.id).first_or_404()
+
+    has_active_checkout = CheckoutRecord.query.filter_by(
+        teacher_id=current_user.id,
+        student_id=student.id,
+        status="checked_out",
+    ).first()
+    if has_active_checkout:
+        flash("Cannot delete a student with active checkouts.", "danger")
+        return redirect(request.referrer or url_for("students.index"))
+
+    student.is_archived = True
+    student.archived_at = datetime.utcnow()
+    db.session.commit()
+    flash("Student deleted.", "success")
+    return redirect(url_for("students.index"))

@@ -55,6 +55,8 @@ class Student(db.Model):
     classroom_id = db.Column(db.Integer, db.ForeignKey("classroom.id"), nullable=True, index=True)
     name = db.Column(db.String(120), nullable=False)
     grade = db.Column(db.String(20), nullable=True)
+    is_archived = db.Column(db.Boolean, nullable=False, default=False, index=True)
+    archived_at = db.Column(db.DateTime, nullable=True)
 
     account = db.relationship("StudentAccount", backref="student", uselist=False, cascade="all, delete-orphan")
     checkout_records = db.relationship("CheckoutRecord", backref="student", lazy="dynamic")
@@ -80,6 +82,8 @@ class Book(db.Model):
     title = db.Column(db.String(255), nullable=False)
     author = db.Column(db.String(255), nullable=False)
     isbn = db.Column(db.String(50), nullable=True)
+    is_archived = db.Column(db.Boolean, nullable=False, default=False, index=True)
+    archived_at = db.Column(db.DateTime, nullable=True)
 
     checkout_records = db.relationship("CheckoutRecord", backref="book", lazy="dynamic")
 

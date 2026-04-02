@@ -11,6 +11,10 @@
   </div>
   <div class="d-flex gap-2">
     <a class="btn btn-outline-secondary" href="{{ url_for('students.edit', student_id=student.id) }}">Edit Student</a>
+    <form method="post" action="{{ url_for('students.delete', student_id=student.id) }}" onsubmit="return confirm('Delete this student? Previous records will remain.')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-outline-danger">Delete Student</button>
+    </form>
     <a class="btn btn-outline-secondary" href="{{ url_for('students.index') }}">Back to Students</a>
   </div>
 </div>

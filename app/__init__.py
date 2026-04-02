@@ -29,6 +29,17 @@ def _ensure_schema_compatibility() -> None:
         student_columns = {column["name"] for column in inspector.get_columns("student")}
         if "classroom_id" not in student_columns:
             db.session.execute(text("ALTER TABLE student ADD COLUMN classroom_id INTEGER"))
+        if "is_archived" not in student_columns:
+            db.session.execute(text("ALTER TABLE student ADD COLUMN is_archived BOOLEAN NOT NULL DEFAULT 0"))
+        if "archived_at" not in student_columns:
+            db.session.execute(text("ALTER TABLE student ADD COLUMN archived_at DATETIME"))
+
+    if "book" in tables:
+        book_columns = {column["name"] for column in inspector.get_columns("book")}
+        if "is_archived" not in book_columns:
+            db.session.execute(text("ALTER TABLE book ADD COLUMN is_archived BOOLEAN NOT NULL DEFAULT 0"))
+        if "archived_at" not in book_columns:
+            db.session.execute(text("ALTER TABLE book ADD COLUMN archived_at DATETIME"))
 
     if "student_account" not in tables:
         StudentAccount.__table__.create(bind=db.engine, checkfirst=True)

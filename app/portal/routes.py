@@ -41,7 +41,7 @@ def student_portal_required(view):
 
 def _student_for_classroom(classroom: Classroom, name: str) -> Student | None:
     students = (
-        Student.query.filter_by(teacher_id=classroom.teacher_id, classroom_id=classroom.id)
+        Student.query.filter_by(teacher_id=classroom.teacher_id, classroom_id=classroom.id, is_archived=False)
         .options(joinedload(Student.account))
         .all()
     )

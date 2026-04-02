@@ -23,8 +23,8 @@ def how_to_use():
 @main_bp.get("/dashboard")
 @login_required
 def dashboard():
-    student_count = Student.query.filter_by(teacher_id=current_user.id).count()
-    book_count = Book.query.filter_by(teacher_id=current_user.id).count()
+    student_count = Student.query.filter_by(teacher_id=current_user.id, is_archived=False).count()
+    book_count = Book.query.filter_by(teacher_id=current_user.id, is_archived=False).count()
     active_checkout_count = CheckoutRecord.query.filter_by(
         teacher_id=current_user.id,
         status="checked_out",

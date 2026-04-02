@@ -15,7 +15,7 @@ from app.utils.matching import find_best_book_match, find_best_name_match
 
 def _student_choices():
     students = (
-        Student.query.filter_by(teacher_id=current_user.id)
+        Student.query.filter_by(teacher_id=current_user.id, is_archived=False)
         .order_by(Student.name.asc())
         .all()
     )
@@ -24,7 +24,7 @@ def _student_choices():
 
 def _book_choices():
     books = (
-        Book.query.filter_by(teacher_id=current_user.id)
+        Book.query.filter_by(teacher_id=current_user.id, is_archived=False)
         .order_by(Book.title.asc())
         .all()
     )
@@ -62,6 +62,7 @@ def new_checkout():
             student = Student.query.filter_by(
                 id=form.existing_student_id.data,
                 teacher_id=current_user.id,
+                is_archived=False,
             ).first()
             if student is None:
                 abort(404)
@@ -78,6 +79,7 @@ def new_checkout():
             book = Book.query.filter_by(
                 id=form.existing_book_id.data,
                 teacher_id=current_user.id,
+                is_archived=False,
             ).first()
             if book is None:
                 abort(404)
