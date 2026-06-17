@@ -32,9 +32,11 @@ class Config:
         database_url = database_url.replace("postgresql://", "postgresql+pg8000://", 1)
 
     SQLALCHEMY_DATABASE_URI = database_url
-    SQLALCHEMY_ENGINE_OPTIONS = (
-        {"connect_args": {"ssl_context": ssl.create_default_context()}}
-        if use_postgres_ssl
-        else {}
-    )
+    if use_postgres_ssl:
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+        SQLALCHEMY_ENGINE_OPTIONS = {"connect_args": {"ssl_context": ssl_context}}
+    else:
+        SQLALCHEMY_ENGINE_OPTIONS = {}
     SQLALCHEMY_TRACK_MODIFICATIONS = False
