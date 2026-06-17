@@ -1,5 +1,7 @@
 import os
+import ssl
 from pathlib import Path
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from dotenv import load_dotenv
 
@@ -12,10 +14,27 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-change-me")
 
     database_url = os.getenv("DATABASE_URL", "sqlite:///bookful_local.db")
+    use_postgres_ssl = False
+
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
     if database_url.startswith("postgresql://"):
+        use_postgres_ssl = True
+        parsed_url = urlsplit(database_url)
+        query = urlencode(
+            [
+                (key, value)
+                for key, value in parse_qsl(parsed_url.query, keep_blank_values=True)
+                if key.lower() != "sslmode"
+            ]
+        )
+        database_url = urlunsplit(parsed_url._replace(query=query))
         database_url = database_url.replace("postgresql://", "postgresql+pg8000://", 1)
 
     SQLALCHEMY_DATABASE_URI = database_url
+    SQLALCHEMY_ENGINE_OPTIONS = (
+        {"connect_args": {"ssl_context": ssl.create_default_context()}}
+        if use_postgres_ssl
+        else {}
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
