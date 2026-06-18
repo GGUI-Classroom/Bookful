@@ -68,6 +68,16 @@ def _ensure_schema_compatibility() -> None:
     if "student_account" not in tables:
         StudentAccount.__table__.create(bind=db.engine, checkfirst=True)
 
+    index_statements = [
+        "CREATE INDEX IF NOT EXISTS ix_student_teacher_archived_name ON student (teacher_id, is_archived, name)",
+        "CREATE INDEX IF NOT EXISTS ix_book_teacher_archived_title ON book (teacher_id, is_archived, title)",
+        "CREATE INDEX IF NOT EXISTS ix_classroom_teacher_name ON classroom (teacher_id, name)",
+        "CREATE INDEX IF NOT EXISTS ix_checkout_teacher_status_student ON checkout_record (teacher_id, status, student_id)",
+        "CREATE INDEX IF NOT EXISTS ix_checkout_teacher_status_book ON checkout_record (teacher_id, status, book_id)",
+    ]
+    for statement in index_statements:
+        db.session.execute(text(statement))
+
     db.session.commit()
 
 

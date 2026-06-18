@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 from app.extensions import db
 from app.forms import RosterImportForm, StudentForm
@@ -56,7 +56,10 @@ def index():
         flash("Student added.", "success")
         return redirect(url_for("students.index"))
 
-    query = Student.query.filter_by(teacher_id=current_user.id, is_archived=False)
+    query = Student.query.options(
+        selectinload(Student.classroom),
+        selectinload(Student.account),
+    ).filter_by(teacher_id=current_user.id, is_archived=False)
     if search_query:
         query = query.filter(Student.name.ilike(f"%{search_query}%"))
 

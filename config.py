@@ -36,7 +36,11 @@ class Config:
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
-        SQLALCHEMY_ENGINE_OPTIONS = {"connect_args": {"ssl_context": ssl_context}}
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            "connect_args": {"ssl_context": ssl_context},
+            "pool_pre_ping": True,
+            "pool_recycle": 300,
+        }
     else:
         SQLALCHEMY_ENGINE_OPTIONS = {}
     SQLALCHEMY_TRACK_MODIFICATIONS = False
