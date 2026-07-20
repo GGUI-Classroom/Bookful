@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Account & Security | Bookful{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="mb-4">
+      <h1 class="h2 mb-1">Account &amp; security</h1>
+      <p class="text-muted mb-0">Manage the teacher account for <strong>{{ current_user.email }}</strong>.</p>
+    </div>
+
+    <section class="card shadow-sm mb-4" id="change-password">
+      <div class="card-body p-4">
+        <h2 class="h4">Change password</h2>
+        <p class="text-muted">Enter your current password before choosing a new one.</p>
+        <form method="post" action="{{ url_for('auth.change_password') }}" novalidate>
+          {{ change_form.hidden_tag() }}
+          <div class="mb-3">
+            {{ change_form.current_password.label(class="form-label") }}
+            {{ change_form.current_password(class="form-control", autocomplete="current-password") }}
+            {% for err in change_form.current_password.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              {{ change_form.new_password.label(class="form-label") }}
+              {{ change_form.new_password(class="form-control", autocomplete="new-password") }}
+              <div class="form-text">Use at least 8 characters.</div>
+              {% for err in change_form.new_password.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6 mb-3">
+              {{ change_form.confirm_password.label(class="form-label") }}
+              {{ change_form.confirm_password(class="form-control", autocomplete="new-password") }}
+              {% for err in change_form.confirm_password.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+            </div>
+          </div>
+          {{ change_form.submit(class="btn btn-primary") }}
+        </form>
+      </div>
+    </section>
+
+    <section class="card border-danger shadow-sm" id="delete-account">
+      <div class="card-body p-4">
+        <h2 class="h4 text-danger">Delete account</h2>
+        <p class="mb-2">This permanently deletes your teacher account, classes, students, books, and checkout history.</p>
+        <p class="text-danger fw-semibold">This cannot be undone.</p>
+        <form method="post" action="{{ url_for('auth.delete_account') }}" novalidate>
+          {{ delete_form.hidden_tag() }}
+          <div class="mb-3">
+            {{ delete_form.password.label(class="form-label") }}
+            {{ delete_form.password(class="form-control", autocomplete="current-password") }}
+            {% for err in delete_form.password.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ delete_form.confirmation.label(class="form-label") }}
+            {{ delete_form.confirmation(class="form-control", autocomplete="off", placeholder="DELETE") }}
+            {% for err in delete_form.confirmation.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+          {{ delete_form.submit(class="btn btn-danger", onclick="return confirm('Permanently delete your Bookful account and all of its data? This cannot be undone.')") }}
+        </form>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

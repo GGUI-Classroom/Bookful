@@ -35,6 +35,14 @@ def _ensure_schema_compatibility() -> None:
             db.session.execute(
                 text("ALTER TABLE teacher ADD COLUMN email_verification_attempts INTEGER NOT NULL DEFAULT 0")
             )
+        if "password_reset_code_hash" not in teacher_columns:
+            db.session.execute(text("ALTER TABLE teacher ADD COLUMN password_reset_code_hash VARCHAR(64)"))
+        if "password_reset_expires_at" not in teacher_columns:
+            db.session.execute(text(f"ALTER TABLE teacher ADD COLUMN password_reset_expires_at {timestamp_type}"))
+        if "password_reset_sent_at" not in teacher_columns:
+            db.session.execute(text(f"ALTER TABLE teacher ADD COLUMN password_reset_sent_at {timestamp_type}"))
+        if "password_reset_attempts" not in teacher_columns:
+            db.session.execute(text("ALTER TABLE teacher ADD COLUMN password_reset_attempts INTEGER NOT NULL DEFAULT 0"))
         if "weekly_reports_enabled" not in teacher_columns:
             db.session.execute(
                 text(

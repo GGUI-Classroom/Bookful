@@ -66,6 +66,7 @@
             <div class="dropdown">
               <button class="btn nav-account dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ current_user.username }}</button>
               <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{{ url_for('auth.account') }}">Account &amp; security</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('reports.settings') }}">Email report settings</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('main.how_to_use') }}">How to use Bookful</a></li>
                 <li><hr class="dropdown-divider"></li>

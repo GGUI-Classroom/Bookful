@@ -33,6 +33,46 @@ class EmailVerificationForm(FlaskForm):
     submit = SubmitField("Verify email")
 
 
+class ForgotPasswordForm(FlaskForm):
+    email = StringField("Teacher email", validators=[DataRequired(), Email(), Length(max=255)])
+    submit = SubmitField("Send reset code")
+
+
+class ResetPasswordForm(FlaskForm):
+    code = StringField(
+        "Reset code",
+        validators=[DataRequired(), Regexp(r"^\d{6}$", message="Enter the six-digit code from your email.")],
+    )
+    password = PasswordField("New password", validators=[DataRequired(), Length(min=8, max=128)])
+    confirm_password = PasswordField(
+        "Confirm new password",
+        validators=[DataRequired(), EqualTo("password", message="Passwords must match.")],
+    )
+    submit = SubmitField("Reset password")
+
+
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField("Current password", validators=[DataRequired(), Length(max=128)])
+    new_password = PasswordField("New password", validators=[DataRequired(), Length(min=8, max=128)])
+    confirm_password = PasswordField(
+        "Confirm new password",
+        validators=[DataRequired(), EqualTo("new_password", message="Passwords must match.")],
+    )
+    submit = SubmitField("Update password")
+
+
+class DeleteAccountForm(FlaskForm):
+    password = PasswordField("Current password", validators=[DataRequired(), Length(max=128)])
+    confirmation = StringField(
+        "Type DELETE to confirm",
+        validators=[
+            DataRequired(),
+            Regexp(r"^DELETE$", message="Type DELETE exactly to confirm account deletion."),
+        ],
+    )
+    submit = SubmitField("Permanently delete account")
+
+
 class WeeklyReportSettingsForm(FlaskForm):
     enabled = BooleanField("Email me a weekly status report")
     weekday = SelectField(

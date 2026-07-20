@@ -14,7 +14,10 @@
             {% for err in form.identifier.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>
           <div class="mb-3">
-            {{ form.password.label(class="form-label") }}
+            <div class="d-flex justify-content-between align-items-center">
+              {{ form.password.label(class="form-label") }}
+              <a class="small" href="{{ url_for('auth.forgot_password') }}">Forgot password?</a>
+            </div>
             {{ form.password(class="form-control") }}
             {% for err in form.password.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>

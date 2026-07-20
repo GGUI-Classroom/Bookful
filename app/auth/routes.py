@@ -3,30 +3,62 @@ import hmac
 import secrets
 from datetime import datetime, timedelta, timezone
 
-from flask import current_app, flash, redirect, render_template, request, url_for
+from flask import current_app, flash, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.auth import auth_bp
 from app.extensions import db
-from app.forms import EmailVerificationForm, LoginForm, SignUpForm
-from app.models import Teacher
-from app.reports.service import EmailConfigurationError, send_email_verification
+from app.forms import (
+    ChangePasswordForm,
+    DeleteAccountForm,
+    EmailVerificationForm,
+    ForgotPasswordForm,
+    LoginForm,
+    ResetPasswordForm,
+    SignUpForm,
+)
+from app.models import (
+    Book,
+    BroadcastMessage,
+    CheckoutRecord,
+    Classroom,
+    Student,
+    StudentAccount,
+    Teacher,
+    TestReportDelivery,
+)
+from app.reports.service import EmailConfigurationError, send_email_verification, send_password_reset_code
 
 
 VERIFICATION_CODE_TTL_MINUTES = 15
 VERIFICATION_RESEND_COOLDOWN_SECONDS = 60
 VERIFICATION_MAX_ATTEMPTS = 5
+PASSWORD_RESET_CODE_TTL_MINUTES = 15
+PASSWORD_RESET_COOLDOWN_SECONDS = 60
+PASSWORD_RESET_MAX_ATTEMPTS = 5
 
 
 def _utc_now() -> datetime:
     return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
+def _code_digest(purpose: str, teacher_id: int, code: str) -> str:
+    key = str(current_app.config["SECRET_KEY"]).encode("utf-8")
+    payload = f"{purpose}:{teacher_id}:{code}".encode("utf-8")
+    return hmac.new(key, payload, hashlib.sha256).hexdigest()
+
+
 def _verification_digest(teacher_id: int, code: str) -> str:
+    # Keep the original verification digest so codes already emailed before
+    # this release remain valid.
     key = str(current_app.config["SECRET_KEY"]).encode("utf-8")
     payload = f"{teacher_id}:{code}".encode("utf-8")
     return hmac.new(key, payload, hashlib.sha256).hexdigest()
+
+
+def _password_reset_digest(teacher_id: int, code: str) -> str:
+    return _code_digest("reset-password", teacher_id, code)
 
 
 def _issue_verification_code(teacher: Teacher, enforce_cooldown: bool = True) -> tuple[bool, int]:
@@ -46,6 +78,25 @@ def _issue_verification_code(teacher: Teacher, enforce_cooldown: bool = True) ->
     teacher.email_verification_sent_at = now
     db.session.commit()
     return True, 0
+
+
+def _issue_password_reset_code(teacher: Teacher) -> bool:
+    now = _utc_now()
+    if teacher.password_reset_sent_at:
+        elapsed = (now - teacher.password_reset_sent_at).total_seconds()
+        if elapsed < PASSWORD_RESET_COOLDOWN_SECONDS:
+            return False
+
+    code = f"{secrets.randbelow(1_000_000):06d}"
+    teacher.password_reset_code_hash = _password_reset_digest(teacher.id, code)
+    teacher.password_reset_expires_at = now + timedelta(minutes=PASSWORD_RESET_CODE_TTL_MINUTES)
+    teacher.password_reset_attempts = 0
+    db.session.commit()
+
+    send_password_reset_code(teacher, code, PASSWORD_RESET_CODE_TTL_MINUTES)
+    teacher.password_reset_sent_at = now
+    db.session.commit()
+    return True
 
 
 @auth_bp.before_app_request
@@ -136,6 +187,79 @@ def login():
     return render_template("auth/login.html", form=form)
 
 
+@auth_bp.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if current_user.is_authenticated:
+        return redirect(url_for("auth.account"))
+
+    form = ForgotPasswordForm()
+    if form.validate_on_submit():
+        email = form.email.data.strip().lower()
+        session["password_reset_email"] = email
+        teacher = Teacher.query.filter_by(email=email).first()
+
+        if teacher and teacher.email_verified_at and teacher.password_hash:
+            try:
+                _issue_password_reset_code(teacher)
+            except Exception:
+                current_app.logger.exception("Could not send password reset code to teacher %s", teacher.id)
+
+        flash(
+            "If a verified teacher account exists for that email, a reset code was sent. Check your junk or spam folder too.",
+            "info",
+        )
+        return redirect(url_for("auth.reset_password"))
+
+    return render_template("auth/forgot_password.html", form=form)
+
+
+@auth_bp.route("/reset-password", methods=["GET", "POST"])
+def reset_password():
+    if current_user.is_authenticated:
+        return redirect(url_for("auth.account"))
+
+    reset_email = session.get("password_reset_email", "")
+    if not reset_email:
+        return redirect(url_for("auth.forgot_password"))
+
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        teacher = Teacher.query.filter_by(email=reset_email).first()
+        now = _utc_now()
+        reset_is_valid = bool(
+            teacher
+            and teacher.password_reset_code_hash
+            and teacher.password_reset_expires_at
+            and teacher.password_reset_expires_at >= now
+            and teacher.password_reset_attempts < PASSWORD_RESET_MAX_ATTEMPTS
+            and hmac.compare_digest(
+                _password_reset_digest(teacher.id, form.code.data),
+                teacher.password_reset_code_hash,
+            )
+        )
+
+        if reset_is_valid:
+            teacher.set_password(form.password.data)
+            teacher.password_reset_code_hash = None
+            teacher.password_reset_expires_at = None
+            teacher.password_reset_sent_at = None
+            teacher.password_reset_attempts = 0
+            db.session.commit()
+            session.pop("password_reset_email", None)
+            flash("Your password has been reset. You can now log in.", "success")
+            return redirect(url_for("auth.login"))
+
+        if teacher and teacher.password_reset_code_hash:
+            teacher.password_reset_attempts += 1
+            if teacher.password_reset_attempts >= PASSWORD_RESET_MAX_ATTEMPTS:
+                teacher.password_reset_code_hash = None
+                teacher.password_reset_expires_at = None
+            db.session.commit()
+        flash("That reset code is invalid or expired. Request a new code and try again.", "danger")
+
+    return render_template("auth/reset_password.html", form=form, reset_email=reset_email)
+
+
 @auth_bp.route("/verify-email", methods=["GET", "POST"])
 @login_required
 def verify_email():
@@ -197,6 +321,73 @@ def resend_verification():
         else:
             flash(f"Please wait {retry_after} seconds before requesting another code.", "warning")
     return redirect(url_for("auth.verify_email"))
+
+
+def _render_account(change_form=None, delete_form=None):
+    return render_template(
+        "auth/account.html",
+        change_form=change_form or ChangePasswordForm(),
+        delete_form=delete_form or DeleteAccountForm(),
+    )
+
+
+@auth_bp.get("/account")
+@login_required
+def account():
+    return _render_account()
+
+
+@auth_bp.post("/account/change-password")
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if not current_user.check_password(form.current_password.data):
+            form.current_password.errors.append("Your current password is incorrect.")
+        elif current_user.check_password(form.new_password.data):
+            form.new_password.errors.append("Choose a password different from your current password.")
+        else:
+            current_user.set_password(form.new_password.data)
+            current_user.password_reset_code_hash = None
+            current_user.password_reset_expires_at = None
+            current_user.password_reset_sent_at = None
+            current_user.password_reset_attempts = 0
+            db.session.commit()
+            flash("Your password was updated successfully.", "success")
+            return redirect(url_for("auth.account"))
+    return _render_account(change_form=form)
+
+
+@auth_bp.post("/account/delete")
+@login_required
+def delete_account():
+    form = DeleteAccountForm()
+    if form.validate_on_submit():
+        if not current_user.check_password(form.password.data):
+            form.password.errors.append("Your current password is incorrect.")
+        else:
+            teacher_id = current_user.id
+            student_ids = db.session.query(Student.id).filter_by(teacher_id=teacher_id)
+            StudentAccount.query.filter(StudentAccount.student_id.in_(student_ids)).delete(synchronize_session=False)
+            CheckoutRecord.query.filter_by(teacher_id=teacher_id).delete(synchronize_session=False)
+            Student.query.filter_by(teacher_id=teacher_id).delete(synchronize_session=False)
+            Book.query.filter_by(teacher_id=teacher_id).delete(synchronize_session=False)
+            Classroom.query.filter_by(teacher_id=teacher_id).delete(synchronize_session=False)
+            BroadcastMessage.query.filter_by(sent_by_teacher_id=teacher_id).delete(synchronize_session=False)
+            TestReportDelivery.query.filter_by(teacher_id=teacher_id).delete(synchronize_session=False)
+            logout_user()
+            Teacher.query.filter_by(id=teacher_id).delete(synchronize_session=False)
+            try:
+                db.session.commit()
+            except SQLAlchemyError:
+                db.session.rollback()
+                flash("We could not delete your account right now. Please try again.", "danger")
+                return redirect(url_for("auth.login"))
+
+            session.clear()
+            flash("Your Bookful teacher account and its library data were permanently deleted.", "info")
+            return redirect(url_for("main.home"))
+    return _render_account(delete_form=form)
 
 
 @auth_bp.get("/logout")

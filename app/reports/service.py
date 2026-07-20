@@ -187,6 +187,23 @@ def send_email_verification(teacher: Teacher, code: str, expires_in_minutes: int
     )
 
 
+def send_password_reset_code(teacher: Teacher, code: str, expires_in_minutes: int = 15) -> str:
+    template_context = {
+        "teacher": teacher,
+        "code": code,
+        "expires_in_minutes": expires_in_minutes,
+        "logo_url": _absolute_url("static", filename="images/bookful-logo.svg"),
+    }
+    text_body = render_template("emails/password_reset.txt", **template_context)
+    html_body = render_template("emails/password_reset.html", **template_context)
+    return send_gmail_message(
+        teacher.email,
+        f"{code} is your Bookful password reset code",
+        text_body,
+        html_body,
+    )
+
+
 def is_weekly_report_due(teacher: Teacher, now_utc: datetime | None = None) -> bool:
     if not teacher.weekly_reports_enabled:
         return False
