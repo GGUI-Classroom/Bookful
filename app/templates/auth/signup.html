@@ -10,7 +10,8 @@
           {{ form.hidden_tag() }}
           <div class="mb-3">
             {{ form.username.label(class="form-label") }}
-            {{ form.username(class="form-control") }}
+            {{ form.username(class="form-control", minlength="3", maxlength="15") }}
+            <div class="form-text">3–15 characters.</div>
             {% for err in form.username.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>
           <div class="mb-3">

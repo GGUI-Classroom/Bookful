@@ -84,6 +84,24 @@ class EmailVerificationTestCase(unittest.TestCase):
         verify_page = self.client.get("/auth/verify-email")
         self.assertEqual(verify_page.status_code, 200)
         self.assertIn(b"Make sure to check your junk or spam folder too", verify_page.data)
+        self.assertIn(b'class="verification-stage"', verify_page.data)
+        self.assertNotIn(b"<nav", verify_page.data)
+        self.assertNotIn(b"app-nav", verify_page.data)
+
+    def test_new_teacher_username_is_limited_to_fifteen_characters(self):
+        response = self.client.post(
+            "/auth/signup",
+            data={
+                "username": "sixteen-characters",
+                "email": "longname@example.com",
+                "password": "password123",
+                "confirm_password": "password123",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"15 characters", response.data)
+        self.assertIsNone(Teacher.query.filter_by(email="longname@example.com").first())
 
     def test_correct_code_verifies_teacher(self):
         teacher = Teacher(
