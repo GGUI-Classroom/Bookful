@@ -22,6 +22,17 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Log In")
 
 
+class EmailVerificationForm(FlaskForm):
+    code = StringField(
+        "Verification code",
+        validators=[
+            DataRequired(),
+            Regexp(r"^\d{6}$", message="Enter the six-digit code from your email."),
+        ],
+    )
+    submit = SubmitField("Verify email")
+
+
 class WeeklyReportSettingsForm(FlaskForm):
     enabled = BooleanField("Email me a weekly status report")
     weekday = SelectField(

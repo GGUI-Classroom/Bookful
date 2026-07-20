@@ -4,14 +4,16 @@ from functools import wraps
 
 from flask import abort, current_app, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+from sqlalchemy.exc import IntegrityError
 
 from app.extensions import csrf, db
 from app.forms import BroadcastReportForm, WeeklyReportSettingsForm
-from app.models import BroadcastMessage, Teacher
+from app.models import BroadcastMessage, Teacher, TestReportDelivery
 from app.reports import reports_bp
 from app.reports.service import (
     EmailConfigurationError,
     is_weekly_report_due,
+    report_local_date,
     send_broadcast_email,
     send_weekly_report,
 )
@@ -20,7 +22,12 @@ from app.reports.service import (
 def is_broadcast_admin(user) -> bool:
     configured_email = current_app.config.get("REPORT_ADMIN_EMAIL", "").strip().lower()
     user_email = getattr(user, "email", "").strip().lower()
-    return bool(configured_email and user.is_authenticated and secrets.compare_digest(user_email, configured_email))
+    return bool(
+        configured_email
+        and user.is_authenticated
+        and user.email_verified_at
+        and secrets.compare_digest(user_email, configured_email)
+    )
 
 
 def broadcast_admin_required(view):
@@ -63,12 +70,26 @@ def settings():
 @reports_bp.post("/send-test")
 @login_required
 def send_test():
+    sent_on = report_local_date(current_user)
+    reservation = TestReportDelivery(teacher_id=current_user.id, sent_on=sent_on)
+    db.session.add(reservation)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        flash("You have already sent a test report today. You can send another tomorrow.", "warning")
+        return redirect(url_for("reports.settings"))
+
     try:
         send_weekly_report(current_user)
     except EmailConfigurationError:
+        TestReportDelivery.query.filter_by(teacher_id=current_user.id, sent_on=sent_on).delete()
+        db.session.commit()
         current_app.logger.exception("Gmail reporting is not configured")
         flash("Email delivery is not configured yet. Finish the Gmail setup in Render.", "danger")
     except Exception:
+        TestReportDelivery.query.filter_by(teacher_id=current_user.id, sent_on=sent_on).delete()
+        db.session.commit()
         current_app.logger.exception("Could not send test report to teacher %s", current_user.id)
         flash("The test report could not be sent. Check the server logs for the delivery error.", "danger")
     else:
@@ -81,7 +102,8 @@ def send_test():
 @broadcast_admin_required
 def broadcast():
     form = BroadcastReportForm()
-    recipient_count = Teacher.query.count()
+    recipient_query = Teacher.query.filter(Teacher.email_verified_at.isnot(None))
+    recipient_count = recipient_query.count()
 
     if form.validate_on_submit():
         if not current_user.check_password(form.password.data):
@@ -100,7 +122,7 @@ def broadcast():
             flash("That exact announcement was already submitted recently, so it was not sent again.", "warning")
             return redirect(url_for("reports.broadcast"))
 
-        recipients = Teacher.query.order_by(Teacher.id.asc()).all()
+        recipients = recipient_query.order_by(Teacher.id.asc()).all()
         audit = BroadcastMessage(
             sent_by_teacher_id=current_user.id,
             subject=form.subject.data.strip(),
@@ -159,7 +181,10 @@ def send_scheduled_reports():
     now_utc = datetime.now(timezone.utc)
     due_teachers = [
         teacher
-        for teacher in Teacher.query.filter_by(weekly_reports_enabled=True).all()
+        for teacher in Teacher.query.filter(
+            Teacher.weekly_reports_enabled.is_(True),
+            Teacher.email_verified_at.isnot(None),
+        ).all()
         if is_weekly_report_due(teacher, now_utc)
     ]
     sent = 0

@@ -47,7 +47,7 @@
       <div class="card-body p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div>
           <h2 class="h5 mb-1">Preview delivery</h2>
-          <p class="text-muted mb-0">Send the current report now without changing your weekly schedule.</p>
+          <p class="text-muted mb-0">Send the current report now without changing your weekly schedule. Limited to one successful test per day.</p>
         </div>
         <form method="post" action="{{ url_for('reports.send_test') }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

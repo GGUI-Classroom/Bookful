@@ -86,6 +86,13 @@ def _report_timezone(teacher: Teacher):
         return timezone.utc
 
 
+def report_local_date(teacher: Teacher, now_utc: datetime | None = None) -> date:
+    now_utc = now_utc or datetime.now(timezone.utc)
+    if now_utc.tzinfo is None:
+        now_utc = now_utc.replace(tzinfo=timezone.utc)
+    return now_utc.astimezone(_report_timezone(teacher)).date()
+
+
 def _gmail_credentials():
     missing = [name for name in REQUIRED_GMAIL_SETTINGS if not current_app.config.get(name)]
     if missing:
@@ -124,7 +131,7 @@ def send_gmail_message(recipient: str, subject: str, text_body: str, html_body: 
 
 
 def send_weekly_report(teacher: Teacher) -> str:
-    local_today = datetime.now(timezone.utc).astimezone(_report_timezone(teacher)).date()
+    local_today = report_local_date(teacher)
     summary = build_weekly_report_summary(teacher.id, today=local_today)
     template_context = {
         "teacher": teacher,
@@ -161,6 +168,23 @@ def send_broadcast_email(recipient: str, subject: str, title: str, message: str,
     text_body = render_template("emails/broadcast.txt", **template_context)
     html_body = render_template("emails/broadcast.html", **template_context)
     return send_gmail_message(recipient, subject, text_body, html_body)
+
+
+def send_email_verification(teacher: Teacher, code: str, expires_in_minutes: int = 15) -> str:
+    template_context = {
+        "teacher": teacher,
+        "code": code,
+        "expires_in_minutes": expires_in_minutes,
+        "logo_url": _absolute_url("static", filename="images/bookful-logo.svg"),
+    }
+    text_body = render_template("emails/verify_email.txt", **template_context)
+    html_body = render_template("emails/verify_email.html", **template_context)
+    return send_gmail_message(
+        teacher.email,
+        f"{code} is your Bookful verification code",
+        text_body,
+        html_body,
+    )
 
 
 def is_weekly_report_due(teacher: Teacher, now_utc: datetime | None = None) -> bool:

@@ -1,0 +1,11 @@
+Hi {{ teacher.username }},
+
+Your Bookful verification code is:
+
+{{ code }}
+
+This code expires in {{ expires_in_minutes }} minutes.
+
+Make sure to check your junk or spam folder too if you have trouble finding Bookful emails.
+
+If you did not create a Bookful teacher account, you can ignore this email.

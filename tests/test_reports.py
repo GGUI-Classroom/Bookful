@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from app import create_app
 from app.extensions import db
-from app.models import Book, BroadcastMessage, CheckoutRecord, Student, Teacher
+from app.models import Book, BroadcastMessage, CheckoutRecord, Student, Teacher, TestReportDelivery
 from app.reports.service import (
     build_weekly_report_summary,
     is_weekly_report_due,
@@ -35,7 +35,11 @@ class ReportsTestCase(unittest.TestCase):
         self.context = self.app.app_context()
         self.context.push()
 
-        self.teacher = Teacher(username="teacher", email="teacher@example.com")
+        self.teacher = Teacher(
+            username="teacher",
+            email="teacher@example.com",
+            email_verified_at=datetime.utcnow(),
+        )
         self.teacher.set_password("password123")
         db.session.add(self.teacher)
         db.session.commit()
@@ -162,7 +166,11 @@ class ReportsTestCase(unittest.TestCase):
         self.assertNotIn(b"Send announcement", navigation.data)
 
     def _create_and_login_admin(self):
-        admin = Teacher(username="bookful-admin", email="g.gui.cmpny@gmail.com")
+        admin = Teacher(
+            username="bookful-admin",
+            email="g.gui.cmpny@gmail.com",
+            email_verified_at=datetime.utcnow(),
+        )
         admin.set_password("admin-password-123")
         db.session.add(admin)
         db.session.commit()
@@ -264,6 +272,24 @@ class ReportsTestCase(unittest.TestCase):
         self.assertIn("Important notice", html_body)
         self.assertNotIn("<script>", html_body)
         self.assertIn("&lt;script&gt;", html_body)
+
+    @patch("app.reports.routes.send_weekly_report", return_value="gmail-message-id")
+    def test_test_report_is_limited_to_one_per_local_day(self, mocked_send):
+        first_response = self.client.post("/reports/send-test", follow_redirects=True)
+        second_response = self.client.post("/reports/send-test", follow_redirects=True)
+
+        self.assertIn(b"test report was sent", first_response.data)
+        self.assertIn(b"already sent a test report today", second_response.data)
+        mocked_send.assert_called_once()
+        self.assertEqual(TestReportDelivery.query.filter_by(teacher_id=self.teacher.id).count(), 1)
+
+    @patch("app.reports.routes.send_weekly_report", side_effect=RuntimeError("delivery failed"))
+    def test_failed_test_report_does_not_consume_daily_allowance(self, mocked_send):
+        response = self.client.post("/reports/send-test", follow_redirects=True)
+
+        self.assertIn(b"could not be sent", response.data)
+        self.assertEqual(mocked_send.call_count, 1)
+        self.assertEqual(TestReportDelivery.query.filter_by(teacher_id=self.teacher.id).count(), 0)
 
 
 if __name__ == "__main__":

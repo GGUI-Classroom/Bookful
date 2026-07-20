@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Verify Teacher Email | Bookful{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7 col-lg-5">
+    <div class="text-center mb-4">
+      <img src="{{ url_for('static', filename='images/bookful-logo.svg') }}" alt="Bookful" width="58" height="58" class="mb-3">
+      <h1 class="h3 mb-2">Verify your teacher email</h1>
+      <p class="text-muted mb-0">Enter the six-digit code sent to <strong>{{ current_user.email }}</strong>.</p>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.code.label(class="form-label") }}
+            {{ form.code(class="form-control form-control-lg verification-code-input", inputmode="numeric", autocomplete="one-time-code", maxlength="6", placeholder="000000", autofocus=true) }}
+            {% for error in form.code.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+          </div>
+          {{ form.submit(class="btn btn-primary w-100") }}
+        </form>
+
+        <div class="alert alert-light border mt-4 mb-3 small">
+          The code expires after 15 minutes. <strong>Make sure to check your junk or spam folder too.</strong>
+        </div>
+        <form method="post" action="{{ url_for('auth.resend_verification') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-link p-0">Send me a new code</button>
+        </form>
+      </div>
+    </div>
+    <p class="text-center mt-3"><a href="{{ url_for('auth.logout') }}">Use a different account</a></p>
+  </div>
+</div>
+{% endblock %}

@@ -20,6 +20,11 @@ class Teacher(UserMixin, db.Model):
     auth_provider = db.Column(db.String(30), nullable=False, default="local", index=True)
     external_subject = db.Column(db.String(255), unique=True, nullable=True, index=True)
     external_email = db.Column(db.String(255), nullable=True, index=True)
+    email_verified_at = db.Column(db.DateTime, nullable=True)
+    email_verification_code_hash = db.Column(db.String(64), nullable=True)
+    email_verification_expires_at = db.Column(db.DateTime, nullable=True)
+    email_verification_sent_at = db.Column(db.DateTime, nullable=True)
+    email_verification_attempts = db.Column(db.Integer, nullable=False, default=0)
     weekly_reports_enabled = db.Column(db.Boolean, nullable=False, default=False)
     weekly_report_weekday = db.Column(db.Integer, nullable=False, default=0)
     weekly_report_hour = db.Column(db.Integer, nullable=False, default=8)
@@ -119,3 +124,15 @@ class BroadcastMessage(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
 
     sent_by = db.relationship("Teacher", backref="broadcast_messages")
+
+
+class TestReportDelivery(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"), nullable=False, index=True)
+    sent_on = db.Column(db.Date, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    teacher = db.relationship("Teacher", backref="test_report_deliveries")
+    __table_args__ = (
+        db.UniqueConstraint("teacher_id", "sent_on", name="uq_test_report_teacher_day"),
+    )

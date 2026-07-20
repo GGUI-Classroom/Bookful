@@ -116,3 +116,11 @@ The endpoint is safe to call hourly. It checks each opted-in teacher's weekday, 
 ### Administrator announcements
 
 Only the authenticated Bookful account whose email exactly matches `REPORT_ADMIN_EMAIL` can access `/reports/broadcast`; authorization is checked on the server for every request. Sending also requires that account's current Bookful password and an explicit confirmation checkbox. Messages use a fixed safe design system rather than accepting custom HTML, are delivered separately to each teacher so recipient addresses are never shared, reject identical submissions within five minutes, and create a database audit record with sent/failed totals.
+
+### Teacher email verification
+
+New teacher accounts must enter a six-digit code sent through the configured Gmail sender before they can access Bookful. Codes expire after 15 minutes, allow five attempts, have a 60-second resend cooldown, and are stored only as keyed hashes. The verification screen and email remind teachers to check junk or spam folders. Student portal accounts are not part of this flow.
+
+When verification columns are added to an existing database, all teacher rows that already existed are automatically stamped as verified. No existing teacher accounts are removed or forced through the new-code flow. Administrator broadcasts and scheduled reports include verified teachers only.
+
+The **Send test report** action is limited to one successful message per teacher per local calendar day. A database uniqueness constraint enforces the limit even if requests arrive simultaneously; failed deliveries release the reservation so the teacher can retry.

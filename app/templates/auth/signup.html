@@ -16,6 +16,7 @@
           <div class="mb-3">
             {{ form.email.label(class="form-label") }}
             {{ form.email(class="form-control") }}
+            <div class="form-text">We’ll email you a six-digit code to verify this teacher account.</div>
             {% for err in form.email.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>
           <div class="mb-3">

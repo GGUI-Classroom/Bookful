@@ -21,6 +21,20 @@ def _ensure_schema_compatibility() -> None:
             db.session.execute(text("ALTER TABLE teacher ADD COLUMN external_subject VARCHAR(255)"))
         if "external_email" not in teacher_columns:
             db.session.execute(text("ALTER TABLE teacher ADD COLUMN external_email VARCHAR(255)"))
+        if "email_verified_at" not in teacher_columns:
+            db.session.execute(text(f"ALTER TABLE teacher ADD COLUMN email_verified_at {timestamp_type}"))
+            # Accounts that predate verification retain access and are trusted as requested.
+            db.session.execute(text("UPDATE teacher SET email_verified_at = CURRENT_TIMESTAMP"))
+        if "email_verification_code_hash" not in teacher_columns:
+            db.session.execute(text("ALTER TABLE teacher ADD COLUMN email_verification_code_hash VARCHAR(64)"))
+        if "email_verification_expires_at" not in teacher_columns:
+            db.session.execute(text(f"ALTER TABLE teacher ADD COLUMN email_verification_expires_at {timestamp_type}"))
+        if "email_verification_sent_at" not in teacher_columns:
+            db.session.execute(text(f"ALTER TABLE teacher ADD COLUMN email_verification_sent_at {timestamp_type}"))
+        if "email_verification_attempts" not in teacher_columns:
+            db.session.execute(
+                text("ALTER TABLE teacher ADD COLUMN email_verification_attempts INTEGER NOT NULL DEFAULT 0")
+            )
         if "weekly_reports_enabled" not in teacher_columns:
             db.session.execute(
                 text(
