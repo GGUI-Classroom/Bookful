@@ -29,25 +29,49 @@
             {% if student_portal_can_self_checkout %}
               <li class="nav-item"><a class="nav-link" href="{{ url_for('portal.borrow') }}">Borrow Book</a></li>
             {% endif %}
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('portal.logout') }}">Logout</a></li>
           </ul>
-          <div class="d-flex gap-3 align-items-center ms-auto">
-            <span class="navbar-text text-white">{{ student_portal_student.name }}</span>
-          </div>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle nav-account" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ student_portal_student.name }}</a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{{ url_for('portal.logout') }}">Log out</a></li>
+              </ul>
+            </li>
+          </ul>
         {% elif current_user.is_authenticated %}
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0 app-primary-nav">
             <li class="nav-item"><a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('classes.index') }}">Classes</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('students.index') }}">Students</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('books.index') }}">Books</a></li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Library</a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ url_for('classes.index') }}">Classes</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('students.index') }}">Students</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('books.index') }}">Books</a></li>
+              </ul>
+            </li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('checkouts.records') }}">Records</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('reports.settings') }}">Email Reports</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.how_to_use') }}">How to Use</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Reports</a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ url_for('reports.settings') }}">My weekly report</a></li>
+                {% if can_send_broadcasts %}
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{{ url_for('reports.broadcast') }}">Send announcement</a></li>
+                {% endif %}
+              </ul>
+            </li>
           </ul>
-          <div class="d-flex gap-3 align-items-center ms-auto">
+          <div class="d-flex gap-2 align-items-center ms-lg-auto nav-actions">
             <a href="{{ url_for('checkouts.new_checkout') }}" class="btn btn-checkout">New Checkout</a>
-            <span class="navbar-text text-white">{{ current_user.username }}</span>
+            <div class="dropdown">
+              <button class="btn nav-account dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ current_user.username }}</button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{{ url_for('reports.settings') }}">Email report settings</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.how_to_use') }}">How to use Bookful</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Log out</a></li>
+              </ul>
+            </div>
           </div>
         {% else %}
           <ul class="navbar-nav ms-auto">

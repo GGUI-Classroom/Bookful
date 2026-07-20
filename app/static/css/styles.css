@@ -25,6 +25,75 @@ body {
   letter-spacing: 0.2px;
 }
 
+.app-nav .navbar-brand {
+  margin-right: 1.75rem;
+}
+
+.app-primary-nav {
+  gap: 0.2rem;
+}
+
+.app-nav .nav-link {
+  border-radius: 0.55rem;
+  padding-left: 0.72rem !important;
+  padding-right: 0.72rem !important;
+}
+
+.app-nav .nav-link:hover,
+.app-nav .nav-link:focus,
+.app-nav .nav-link.show {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.app-nav .dropdown-menu {
+  border: 0;
+  border-radius: 0.75rem;
+  box-shadow: 0 14px 36px rgba(10, 37, 88, 0.2);
+  padding: 0.5rem;
+}
+
+.app-nav .dropdown-item {
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.7rem;
+}
+
+.nav-account {
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.6rem;
+  font-weight: 600;
+}
+
+.nav-account:hover,
+.nav-account:focus,
+.nav-account.show {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.broadcast-preview-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  background: #eef4ff;
+  border-top: 5px solid #1b66ff;
+}
+
+.broadcast-preview-header small {
+  color: #315d9f;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.broadcast-preview-message {
+  min-height: 7rem;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
 .btn-primary {
   background: #1b66ff;
   border-color: #1b66ff;
@@ -227,6 +296,22 @@ body {
 }
 
 @media (max-width: 991.98px) {
+  .app-nav .navbar-brand {
+    margin-right: 0;
+  }
+
+  .nav-actions {
+    align-items: stretch !important;
+    flex-direction: column;
+    margin-top: 0.75rem;
+  }
+
+  .nav-actions .btn,
+  .nav-actions .dropdown,
+  .nav-actions .dropdown-toggle {
+    width: 100%;
+  }
+
   .landing-hero {
     padding: 2rem 1.2rem;
   }

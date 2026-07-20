@@ -98,7 +98,8 @@ flask --app run.py gmail-authorize --credentials "C:\\path\\to\\client_secret.js
    - `GMAIL_SENDER_EMAIL`
 5. Set `PUBLIC_BASE_URL` to the deployed Bookful origin, without a trailing slash.
 6. Set `REPORT_JOB_SECRET` to a separate long random value. Never reuse `SECRET_KEY`.
-7. In cron-job.org, create an hourly `POST` request to:
+7. Set `REPORT_ADMIN_EMAIL=g.gui.cmpny@gmail.com` to grant that signed-in Bookful account access to the broadcast composer.
+8. In cron-job.org, create an hourly `POST` request to:
 
 ```text
 https://your-bookful-app.onrender.com/reports/tasks/send-weekly
@@ -111,3 +112,7 @@ Authorization: Bearer your-report-job-secret
 ```
 
 The endpoint is safe to call hourly. It checks each opted-in teacher's weekday, hour, time zone, and last delivery before sending. Teachers manage their preference under **Email Reports**, and the manual test-send button does not alter their weekly schedule.
+
+### Administrator announcements
+
+Only the authenticated Bookful account whose email exactly matches `REPORT_ADMIN_EMAIL` can access `/reports/broadcast`; authorization is checked on the server for every request. Sending also requires that account's current Bookful password and an explicit confirmation checkbox. Messages use a fixed safe design system rather than accepting custom HTML, are delivered separately to each teacher so recipient addresses are never shared, reject identical submissions within five minutes, and create a database audit record with sent/failed totals.

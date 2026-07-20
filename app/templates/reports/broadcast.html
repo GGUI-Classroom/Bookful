@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Send Announcement | Bookful{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-xl-7">
+    <div class="mb-4">
+      <span class="badge text-bg-danger mb-2">Administrator only</span>
+      <h1 class="h3 mb-1">Send a Bookful announcement</h1>
+      <p class="text-muted mb-0">This sends one private email to each of {{ recipient_count }} registered teachers.</p>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <form method="post" id="broadcastForm">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.subject.label(class="form-label") }}
+            {{ form.subject(class="form-control", placeholder="Example: Scheduled Bookful maintenance") }}
+            {% for error in form.subject.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.title.label(class="form-label") }}
+            {{ form.title(class="form-control", placeholder="Example: Bookful will be unavailable tonight") }}
+            {% for error in form.title.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.message.label(class="form-label") }}
+            {{ form.message(class="form-control", rows="8", placeholder="Explain what is happening, when it starts, and what users should expect.") }}
+            <div class="form-text">Plain text only. Bookful safely formats it into the branded email.</div>
+            {% for error in form.message.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.theme.label(class="form-label") }}
+            {{ form.theme(class="form-select") }}
+          </div>
+          <div class="alert alert-warning">
+            <strong>Final security check</strong>
+            <p class="small mb-3">Enter your current Bookful password. The server checks both your account email and password before sending.</p>
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control", autocomplete="current-password") }}
+            {% for error in form.password.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            <div class="form-check mt-3">
+              {{ form.confirm(class="form-check-input") }}
+              {{ form.confirm.label(class="form-check-label") }}
+              {% for error in form.confirm.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            </div>
+          </div>
+          {{ form.submit(class="btn btn-danger", id="broadcastSubmit") }}
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-5">
+    <div class="broadcast-preview position-sticky" style="top: 1rem;">
+      <p class="small text-uppercase fw-bold text-muted mb-2">Email preview</p>
+      <div class="card border-0 shadow-sm overflow-hidden">
+        <div class="broadcast-preview-header" id="previewHeader">
+          <img src="{{ url_for('static', filename='images/bookful-logo.svg') }}" alt="Bookful" width="42" height="42">
+          <div>
+            <small id="previewLabel">Bookful update</small>
+            <h2 class="h5 mb-0" id="previewTitle">Your report title</h2>
+          </div>
+        </div>
+        <div class="card-body p-4">
+          <p class="broadcast-preview-message mb-4" id="previewMessage">Your announcement will appear here.</p>
+          <span class="btn btn-primary disabled">Open Bookful</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(() => {
+  const themes = {
+    info: {accent: "#1b66ff", soft: "#eef4ff", label: "Bookful update"},
+    maintenance: {accent: "#b85c00", soft: "#fff3e8", label: "Service notice"},
+    urgent: {accent: "#bd2130", soft: "#fff0f1", label: "Important notice"},
+    success: {accent: "#14734a", soft: "#eaf8f1", label: "Good news"}
+  };
+  const title = document.getElementById("title");
+  const message = document.getElementById("message");
+  const theme = document.getElementById("theme");
+  const header = document.getElementById("previewHeader");
+  const updatePreview = () => {
+    const selected = themes[theme.value] || themes.info;
+    document.getElementById("previewTitle").textContent = title.value || "Your report title";
+    document.getElementById("previewMessage").textContent = message.value || "Your announcement will appear here.";
+    document.getElementById("previewLabel").textContent = selected.label;
+    header.style.background = selected.soft;
+    header.style.borderColor = selected.accent;
+  };
+  [title, message, theme].forEach((field) => field.addEventListener("input", updatePreview));
+  updatePreview();
+
+  document.getElementById("broadcastForm").addEventListener("submit", () => {
+    const button = document.getElementById("broadcastSubmit");
+    button.disabled = true;
+    button.value = "Sending...";
+  });
+})();
+</script>
+{% endblock %}

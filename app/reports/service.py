@@ -71,6 +71,14 @@ def _dashboard_url() -> str:
     return url_for("main.dashboard", _external=True)
 
 
+def _absolute_url(endpoint: str, **values) -> str:
+    configured_base_url = current_app.config.get("PUBLIC_BASE_URL", "").rstrip("/")
+    path = url_for(endpoint, **values)
+    if configured_base_url:
+        return f"{configured_base_url}{path}"
+    return url_for(endpoint, _external=True, **values)
+
+
 def _report_timezone(teacher: Teacher):
     try:
         return ZoneInfo(teacher.weekly_report_timezone)
@@ -131,6 +139,28 @@ def send_weekly_report(teacher: Teacher) -> str:
         text_body,
         html_body,
     )
+
+
+BROADCAST_THEMES = {
+    "info": {"accent": "#1b66ff", "soft": "#eef4ff", "label": "Bookful update"},
+    "maintenance": {"accent": "#b85c00", "soft": "#fff3e8", "label": "Service notice"},
+    "urgent": {"accent": "#bd2130", "soft": "#fff0f1", "label": "Important notice"},
+    "success": {"accent": "#14734a", "soft": "#eaf8f1", "label": "Good news"},
+}
+
+
+def send_broadcast_email(recipient: str, subject: str, title: str, message: str, theme: str) -> str:
+    selected_theme = BROADCAST_THEMES.get(theme, BROADCAST_THEMES["info"])
+    template_context = {
+        "title": title,
+        "message": message,
+        "theme": selected_theme,
+        "dashboard_url": _dashboard_url(),
+        "logo_url": _absolute_url("static", filename="images/bookful-logo.svg"),
+    }
+    text_body = render_template("emails/broadcast.txt", **template_context)
+    html_body = render_template("emails/broadcast.html", **template_context)
+    return send_gmail_message(recipient, subject, text_body, html_body)
 
 
 def is_weekly_report_due(teacher: Teacher, now_utc: datetime | None = None) -> bool:

@@ -19,6 +19,7 @@ class Config:
     GMAIL_SENDER_EMAIL = os.getenv("GMAIL_SENDER_EMAIL", "")
     GMAIL_SENDER_NAME = os.getenv("GMAIL_SENDER_NAME", "Bookful Reports")
     REPORT_JOB_SECRET = os.getenv("REPORT_JOB_SECRET", "")
+    REPORT_ADMIN_EMAIL = os.getenv("REPORT_ADMIN_EMAIL", "g.gui.cmpny@gmail.com").strip().lower()
 
     database_url = os.getenv("DATABASE_URL", "sqlite:///bookful_local.db")
     use_postgres_ssl = False

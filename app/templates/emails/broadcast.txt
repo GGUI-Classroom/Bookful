@@ -1,0 +1,10 @@
+{{ theme.label }}
+
+{{ title }}
+
+{{ message }}
+
+Open Bookful:
+{{ dashboard_url }}
+
+This operational announcement was sent to registered Bookful teachers.

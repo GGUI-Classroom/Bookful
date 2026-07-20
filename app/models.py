@@ -104,3 +104,18 @@ class CheckoutRecord(db.Model):
     due_date = db.Column(db.Date, nullable=True)
     return_date = db.Column(db.Date, nullable=True)
     status = db.Column(db.String(30), nullable=False, default="checked_out", index=True)
+
+
+class BroadcastMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sent_by_teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"), nullable=False, index=True)
+    subject = db.Column(db.String(140), nullable=False)
+    title = db.Column(db.String(120), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    theme = db.Column(db.String(20), nullable=False, default="info")
+    recipient_count = db.Column(db.Integer, nullable=False, default=0)
+    sent_count = db.Column(db.Integer, nullable=False, default=0)
+    failed_count = db.Column(db.Integer, nullable=False, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+
+    sent_by = db.relationship("Teacher", backref="broadcast_messages")

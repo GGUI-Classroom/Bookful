@@ -2,7 +2,7 @@ from datetime import date
 
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, DateField, FileField, IntegerField, PasswordField, SelectField, StringField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange, Optional, ValidationError
+from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange, Optional, Regexp, ValidationError
 
 
 class SignUpForm(FlaskForm):
@@ -56,6 +56,34 @@ class WeeklyReportSettingsForm(FlaskForm):
         ],
     )
     submit = SubmitField("Save report settings")
+
+
+class BroadcastReportForm(FlaskForm):
+    subject = StringField(
+        "Email subject",
+        validators=[
+            DataRequired(),
+            Length(min=3, max=140),
+            Regexp(r"^[^\r\n]+$", message="The email subject must be a single line."),
+        ],
+    )
+    title = StringField("Report title", validators=[DataRequired(), Length(min=3, max=120)])
+    message = TextAreaField("Message", validators=[DataRequired(), Length(min=10, max=5000)])
+    theme = SelectField(
+        "Design",
+        choices=[
+            ("info", "Bookful blue"),
+            ("maintenance", "Maintenance amber"),
+            ("urgent", "Urgent red"),
+            ("success", "Success green"),
+        ],
+    )
+    password = PasswordField("Confirm your Bookful password", validators=[DataRequired(), Length(max=128)])
+    confirm = BooleanField(
+        "I understand this will immediately email every registered teacher.",
+        validators=[DataRequired(message="Confirm that you want to email every registered teacher.")],
+    )
+    submit = SubmitField("Send to everyone")
 
 
 class StudentForm(FlaskForm):

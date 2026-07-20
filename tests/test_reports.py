@@ -4,8 +4,13 @@ from unittest.mock import patch
 
 from app import create_app
 from app.extensions import db
-from app.models import Book, CheckoutRecord, Student, Teacher
-from app.reports.service import build_weekly_report_summary, is_weekly_report_due, send_weekly_report
+from app.models import Book, BroadcastMessage, CheckoutRecord, Student, Teacher
+from app.reports.service import (
+    build_weekly_report_summary,
+    is_weekly_report_due,
+    send_broadcast_email,
+    send_weekly_report,
+)
 
 
 class TestConfig:
@@ -21,6 +26,7 @@ class TestConfig:
     GMAIL_REFRESH_TOKEN = "test-refresh-token"
     GMAIL_SENDER_EMAIL = "bookfulreports@gmail.com"
     GMAIL_SENDER_NAME = "Bookful Reports"
+    REPORT_ADMIN_EMAIL = "g.gui.cmpny@gmail.com"
 
 
 class ReportsTestCase(unittest.TestCase):
@@ -147,6 +153,117 @@ class ReportsTestCase(unittest.TestCase):
         self.assertEqual(subject, "Your weekly Bookful status report")
         self.assertIn("https://bookful.example/dashboard", text_body)
         self.assertIn("Open Bookful dashboard", html_body)
+
+    def test_regular_teacher_cannot_open_broadcast_composer(self):
+        response = self.client.get("/reports/broadcast")
+        self.assertEqual(response.status_code, 403)
+
+        navigation = self.client.get("/dashboard")
+        self.assertNotIn(b"Send announcement", navigation.data)
+
+    def _create_and_login_admin(self):
+        admin = Teacher(username="bookful-admin", email="g.gui.cmpny@gmail.com")
+        admin.set_password("admin-password-123")
+        db.session.add(admin)
+        db.session.commit()
+        with self.client.session_transaction() as session:
+            session["_user_id"] = str(admin.id)
+            session["_fresh"] = True
+        return admin
+
+    def test_admin_can_open_broadcast_composer(self):
+        self._create_and_login_admin()
+        response = self.client.get("/reports/broadcast")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Send a Bookful announcement", response.data)
+        self.assertIn(b"Administrator only", response.data)
+
+        navigation = self.client.get("/dashboard")
+        self.assertIn(b"Send announcement", navigation.data)
+
+    @patch("app.reports.routes.send_broadcast_email", return_value="gmail-message-id")
+    def test_broadcast_requires_admin_password(self, mocked_send):
+        self._create_and_login_admin()
+        response = self.client.post(
+            "/reports/broadcast",
+            data={
+                "subject": "Website maintenance",
+                "title": "Bookful will be unavailable tonight",
+                "message": "We will be completing scheduled maintenance tonight at 9 PM.",
+                "theme": "maintenance",
+                "password": "wrong-password",
+                "confirm": "y",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"password is incorrect", response.data)
+        mocked_send.assert_not_called()
+        self.assertEqual(BroadcastMessage.query.count(), 0)
+
+    @patch("app.reports.routes.send_broadcast_email", return_value="gmail-message-id")
+    def test_admin_broadcast_sends_individually_and_creates_audit_log(self, mocked_send):
+        admin = self._create_and_login_admin()
+        response = self.client.post(
+            "/reports/broadcast",
+            data={
+                "subject": "Website maintenance",
+                "title": "Bookful will be unavailable tonight",
+                "message": "We will be completing scheduled maintenance tonight at 9 PM.",
+                "theme": "maintenance",
+                "password": "admin-password-123",
+                "confirm": "y",
+            },
+            follow_redirects=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"sent successfully to 2 registered teachers", response.data)
+        self.assertEqual(mocked_send.call_count, 2)
+        recipients = {call.args[0] for call in mocked_send.call_args_list}
+        self.assertEqual(recipients, {"teacher@example.com", "g.gui.cmpny@gmail.com"})
+
+        audit = BroadcastMessage.query.one()
+        self.assertEqual(audit.sent_by_teacher_id, admin.id)
+        self.assertEqual(audit.recipient_count, 2)
+        self.assertEqual(audit.sent_count, 2)
+        self.assertEqual(audit.failed_count, 0)
+
+    @patch("app.reports.routes.send_broadcast_email", return_value="gmail-message-id")
+    def test_duplicate_broadcast_is_blocked(self, mocked_send):
+        self._create_and_login_admin()
+        payload = {
+            "subject": "Website maintenance",
+            "title": "Bookful will be unavailable tonight",
+            "message": "We will be completing scheduled maintenance tonight at 9 PM.",
+            "theme": "maintenance",
+            "password": "admin-password-123",
+            "confirm": "y",
+        }
+        first_response = self.client.post("/reports/broadcast", data=payload)
+        second_response = self.client.post("/reports/broadcast", data=payload, follow_redirects=True)
+
+        self.assertEqual(first_response.status_code, 302)
+        self.assertIn(b"already submitted recently", second_response.data)
+        self.assertEqual(mocked_send.call_count, 2)
+        self.assertEqual(BroadcastMessage.query.count(), 1)
+
+    @patch("app.reports.service.send_gmail_message", return_value="gmail-message-id")
+    def test_broadcast_template_is_branded_and_escapes_custom_content(self, mocked_send):
+        with self.app.test_request_context("/"):
+            message_id = send_broadcast_email(
+                "teacher@example.com",
+                "Website down",
+                "Temporary outage",
+                "Please wait <script>alert('unsafe')</script>",
+                "urgent",
+            )
+
+        self.assertEqual(message_id, "gmail-message-id")
+        _, subject, _, html_body = mocked_send.call_args.args
+        self.assertEqual(subject, "Website down")
+        self.assertIn("bookful-logo.svg", html_body)
+        self.assertIn("Important notice", html_body)
+        self.assertNotIn("<script>", html_body)
+        self.assertIn("&lt;script&gt;", html_body)
 
 
 if __name__ == "__main__":

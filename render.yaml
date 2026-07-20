@@ -26,3 +26,5 @@ services:
         value: Bookful Reports
       - key: REPORT_JOB_SECRET
         generateValue: true
+      - key: REPORT_ADMIN_EMAIL
+        value: g.gui.cmpny@gmail.com

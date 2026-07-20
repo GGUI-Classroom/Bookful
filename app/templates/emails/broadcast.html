@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<body style="margin:0;background:#f5f7fb;font-family:Arial,sans-serif;color:#183153;">
+  <div style="max-width:620px;margin:0 auto;padding:28px 16px;">
+    <div style="background:{{ theme.soft }};border-top:6px solid {{ theme.accent }};border-radius:16px 16px 0 0;padding:24px;">
+      <table role="presentation" style="border-collapse:collapse;">
+        <tr>
+          <td style="padding-right:14px;"><img src="{{ logo_url }}" width="48" height="48" alt="Bookful logo" style="display:block;border-radius:10px;"></td>
+          <td>
+            <div style="color:{{ theme.accent }};font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">{{ theme.label }}</div>
+            <h1 style="margin:5px 0 0;font-size:25px;line-height:1.25;color:#183153;">{{ title }}</h1>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div style="background:#fff;border-radius:0 0 16px 16px;padding:26px;">
+      <div style="font-size:16px;line-height:1.7;white-space:pre-line;">{{ message }}</div>
+      <p style="margin:26px 0 14px;">
+        <a href="{{ dashboard_url }}" style="display:inline-block;background:{{ theme.accent }};color:#fff;text-decoration:none;font-weight:700;border-radius:9px;padding:12px 18px;">Open Bookful</a>
+      </p>
+      <p style="font-size:12px;color:#71819c;margin-bottom:0;">This operational announcement was sent privately to registered Bookful teachers.</p>
+    </div>
+  </div>
+</body>
+</html>
