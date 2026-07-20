@@ -12,6 +12,13 @@ load_dotenv(BASE_DIR / ".env")
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-change-me")
+    PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "").rstrip("/")
+    GMAIL_CLIENT_ID = os.getenv("GMAIL_CLIENT_ID", "")
+    GMAIL_CLIENT_SECRET = os.getenv("GMAIL_CLIENT_SECRET", "")
+    GMAIL_REFRESH_TOKEN = os.getenv("GMAIL_REFRESH_TOKEN", "")
+    GMAIL_SENDER_EMAIL = os.getenv("GMAIL_SENDER_EMAIL", "")
+    GMAIL_SENDER_NAME = os.getenv("GMAIL_SENDER_NAME", "Bookful Reports")
+    REPORT_JOB_SECRET = os.getenv("REPORT_JOB_SECRET", "")
 
     database_url = os.getenv("DATABASE_URL", "sqlite:///bookful_local.db")
     use_postgres_ssl = False

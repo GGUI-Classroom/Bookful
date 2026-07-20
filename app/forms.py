@@ -1,7 +1,7 @@
 from datetime import date
 
 from flask_wtf import FlaskForm
-from wtforms import DateField, FileField, IntegerField, PasswordField, SelectField, StringField, SubmitField, TextAreaField
+from wtforms import BooleanField, DateField, FileField, IntegerField, PasswordField, SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange, Optional, ValidationError
 
 
@@ -20,6 +20,42 @@ class LoginForm(FlaskForm):
     identifier = StringField("Username or Email", validators=[DataRequired(), Length(max=255)])
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Log In")
+
+
+class WeeklyReportSettingsForm(FlaskForm):
+    enabled = BooleanField("Email me a weekly status report")
+    weekday = SelectField(
+        "Delivery day",
+        coerce=int,
+        choices=[
+            (0, "Monday"),
+            (1, "Tuesday"),
+            (2, "Wednesday"),
+            (3, "Thursday"),
+            (4, "Friday"),
+            (5, "Saturday"),
+            (6, "Sunday"),
+        ],
+    )
+    hour = SelectField(
+        "Delivery time",
+        coerce=int,
+        choices=[(hour, f"{hour % 12 or 12}:00 {'AM' if hour < 12 else 'PM'}") for hour in range(24)],
+    )
+    timezone = SelectField(
+        "Time zone",
+        choices=[
+            ("America/New_York", "Eastern Time"),
+            ("America/Chicago", "Central Time"),
+            ("America/Denver", "Mountain Time"),
+            ("America/Phoenix", "Arizona Time"),
+            ("America/Los_Angeles", "Pacific Time"),
+            ("America/Anchorage", "Alaska Time"),
+            ("Pacific/Honolulu", "Hawaii Time"),
+            ("UTC", "UTC"),
+        ],
+    )
+    submit = SubmitField("Save report settings")
 
 
 class StudentForm(FlaskForm):

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Email Reports | Bookful{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+      <div>
+        <h1 class="h3 mb-1">Weekly email reports</h1>
+        <p class="text-muted mb-0">Reports are sent to your registered email: <strong>{{ current_user.email }}</strong></p>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body p-4">
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="form-check form-switch mb-4">
+            {{ form.enabled(class="form-check-input", role="switch") }}
+            {{ form.enabled.label(class="form-check-label fw-semibold") }}
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              {{ form.weekday.label(class="form-label") }}
+              {{ form.weekday(class="form-select") }}
+            </div>
+            <div class="col-md-4">
+              {{ form.hour.label(class="form-label") }}
+              {{ form.hour(class="form-select") }}
+            </div>
+            <div class="col-md-4">
+              {{ form.timezone.label(class="form-label") }}
+              {{ form.timezone(class="form-select") }}
+            </div>
+          </div>
+
+          <p class="small text-muted mt-3 mb-4">
+            The email includes aggregate totals for students, books, active checkouts, overdue books,
+            upcoming due dates, and recent returns. Student names are kept inside Bookful.
+          </p>
+          {{ form.submit(class="btn btn-primary") }}
+        </form>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+          <h2 class="h5 mb-1">Preview delivery</h2>
+          <p class="text-muted mb-0">Send the current report now without changing your weekly schedule.</p>
+        </div>
+        <form method="post" action="{{ url_for('reports.send_test') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-outline-primary" type="submit">Send test report</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

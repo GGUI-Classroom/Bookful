@@ -20,6 +20,11 @@ class Teacher(UserMixin, db.Model):
     auth_provider = db.Column(db.String(30), nullable=False, default="local", index=True)
     external_subject = db.Column(db.String(255), unique=True, nullable=True, index=True)
     external_email = db.Column(db.String(255), nullable=True, index=True)
+    weekly_reports_enabled = db.Column(db.Boolean, nullable=False, default=False)
+    weekly_report_weekday = db.Column(db.Integer, nullable=False, default=0)
+    weekly_report_hour = db.Column(db.Integer, nullable=False, default=8)
+    weekly_report_timezone = db.Column(db.String(64), nullable=False, default="America/Los_Angeles")
+    weekly_report_last_sent_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     students = db.relationship("Student", backref="teacher", lazy="dynamic", cascade="all, delete-orphan")

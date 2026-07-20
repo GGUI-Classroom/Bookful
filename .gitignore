@@ -8,6 +8,10 @@ __pycache__/
 venv/
 .venv/
 .env
+credentials*.json
+client_secret*.json
+gmail-token*.json
+token.json
 instance/
 bookful_local.db
 migrations/versions/__pycache__/

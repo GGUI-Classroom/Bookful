@@ -58,6 +58,7 @@ flask --app run.py run
 3. In Render dashboard for web service, set:
    - `SECRET_KEY` to a strong random value.
    - `DATABASE_URL` to your Supabase session pooler connection string.
+   - The Gmail reporting variables described below if email reports are enabled.
 4. After first deploy, run migrations in Render Shell:
 
 ```bash
@@ -77,3 +78,36 @@ This project also calls `db.create_all()` on startup as a first-deploy safety ne
 - `/books/`
 - `/checkouts/new`
 - `/checkouts/history`
+
+## Gmail Weekly Reports
+
+Bookful can send opt-in aggregate reports to each teacher's registered email through one dedicated Gmail account. Bookful users continue to use Bookful's normal login; only the sender account authorizes Google.
+
+1. In Google Cloud, enable the Gmail API and create an OAuth Desktop client with only the `gmail.send` scope.
+2. Download the OAuth client JSON outside the repository.
+3. Install dependencies, then authorize the dedicated sender locally:
+
+```bash
+flask --app run.py gmail-authorize --credentials "C:\\path\\to\\client_secret.json" --sender bookfulreports@gmail.com
+```
+
+4. Add the four values printed by that command to Render:
+   - `GMAIL_CLIENT_ID`
+   - `GMAIL_CLIENT_SECRET`
+   - `GMAIL_REFRESH_TOKEN`
+   - `GMAIL_SENDER_EMAIL`
+5. Set `PUBLIC_BASE_URL` to the deployed Bookful origin, without a trailing slash.
+6. Set `REPORT_JOB_SECRET` to a separate long random value. Never reuse `SECRET_KEY`.
+7. In cron-job.org, create an hourly `POST` request to:
+
+```text
+https://your-bookful-app.onrender.com/reports/tasks/send-weekly
+```
+
+Add this request header, substituting the same secret stored in Render:
+
+```text
+Authorization: Bearer your-report-job-secret
+```
+
+The endpoint is safe to call hourly. It checks each opted-in teacher's weekday, hour, time zone, and last delivery before sending. Teachers manage their preference under **Email Reports**, and the manual test-send button does not alter their weekly schedule.

@@ -1,0 +1,15 @@
+Hi {{ teacher.username }},
+
+Here is your weekly Bookful status report:
+
+Students: {{ summary.student_count }}
+Books: {{ summary.book_count }}
+Active checkouts: {{ summary.active_checkout_count }}
+Overdue: {{ summary.overdue_count }}
+Due in the next 7 days: {{ summary.due_soon_count }}
+Returned in the last 7 days: {{ summary.recent_return_count }}
+
+Open your dashboard for details:
+{{ dashboard_url }}
+
+You can change or disable these reports from Email Reports in Bookful.

@@ -21,6 +21,25 @@ def _ensure_schema_compatibility() -> None:
             db.session.execute(text("ALTER TABLE teacher ADD COLUMN external_subject VARCHAR(255)"))
         if "external_email" not in teacher_columns:
             db.session.execute(text("ALTER TABLE teacher ADD COLUMN external_email VARCHAR(255)"))
+        if "weekly_reports_enabled" not in teacher_columns:
+            db.session.execute(
+                text(
+                    f"ALTER TABLE teacher ADD COLUMN weekly_reports_enabled BOOLEAN NOT NULL DEFAULT {boolean_default}"
+                )
+            )
+        if "weekly_report_weekday" not in teacher_columns:
+            db.session.execute(text("ALTER TABLE teacher ADD COLUMN weekly_report_weekday INTEGER NOT NULL DEFAULT 0"))
+        if "weekly_report_hour" not in teacher_columns:
+            db.session.execute(text("ALTER TABLE teacher ADD COLUMN weekly_report_hour INTEGER NOT NULL DEFAULT 8"))
+        if "weekly_report_timezone" not in teacher_columns:
+            db.session.execute(
+                text(
+                    "ALTER TABLE teacher ADD COLUMN weekly_report_timezone "
+                    "VARCHAR(64) NOT NULL DEFAULT 'America/Los_Angeles'"
+                )
+            )
+        if "weekly_report_last_sent_at" not in teacher_columns:
+            db.session.execute(text(f"ALTER TABLE teacher ADD COLUMN weekly_report_last_sent_at {timestamp_type}"))
 
     if "classroom" not in tables:
         Classroom.__table__.create(bind=db.engine, checkfirst=True)
@@ -97,12 +116,14 @@ def create_app(config_object: str = "config.Config") -> Flask:
     from app.checkouts import checkouts_bp
     from app.main import main_bp
     from app.portal import portal_bp
+    from app.reports import reports_bp
     from app.students import students_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(classes_bp)
     app.register_blueprint(portal_bp)
+    app.register_blueprint(reports_bp)
     app.register_blueprint(students_bp)
     app.register_blueprint(books_bp)
     app.register_blueprint(checkouts_bp)
@@ -111,5 +132,9 @@ def create_app(config_object: str = "config.Config") -> Flask:
     with app.app_context():
         db.create_all()
         _ensure_schema_compatibility()
+
+    from app.reports.service import register_gmail_cli
+
+    register_gmail_cli(app)
 
     return app

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<body style="margin:0;background:#f5f7fb;font-family:Arial,sans-serif;color:#183153;">
+  <div style="max-width:620px;margin:0 auto;padding:28px 16px;">
+    <div style="background:linear-gradient(135deg,#0d2f74,#2672ff);border-radius:16px 16px 0 0;padding:26px;color:#fff;">
+      <div style="font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#a9edff;">Bookful</div>
+      <h1 style="margin:8px 0 0;font-size:26px;">Your weekly status report</h1>
+    </div>
+    <div style="background:#fff;border-radius:0 0 16px 16px;padding:26px;">
+      <p style="margin-top:0;">Hi {{ teacher.username }}, here is the latest activity from your classroom library.</p>
+      <table role="presentation" style="width:100%;border-collapse:separate;border-spacing:8px;">
+        <tr>
+          <td style="background:#eef4ff;border-radius:10px;padding:16px;"><strong style="font-size:25px;">{{ summary.student_count }}</strong><br><span style="color:#587099;">Students</span></td>
+          <td style="background:#eef4ff;border-radius:10px;padding:16px;"><strong style="font-size:25px;">{{ summary.book_count }}</strong><br><span style="color:#587099;">Books</span></td>
+        </tr>
+        <tr>
+          <td style="background:#eef4ff;border-radius:10px;padding:16px;"><strong style="font-size:25px;">{{ summary.active_checkout_count }}</strong><br><span style="color:#587099;">Active checkouts</span></td>
+          <td style="background:#fff3e8;border-radius:10px;padding:16px;"><strong style="font-size:25px;color:#b85400;">{{ summary.overdue_count }}</strong><br><span style="color:#7c684f;">Overdue</span></td>
+        </tr>
+        <tr>
+          <td style="background:#eef4ff;border-radius:10px;padding:16px;"><strong style="font-size:25px;">{{ summary.due_soon_count }}</strong><br><span style="color:#587099;">Due in 7 days</span></td>
+          <td style="background:#eaf8f1;border-radius:10px;padding:16px;"><strong style="font-size:25px;color:#14734a;">{{ summary.recent_return_count }}</strong><br><span style="color:#4c7565;">Returned this week</span></td>
+        </tr>
+      </table>
+      <p style="margin:24px 0 14px;">
+        <a href="{{ dashboard_url }}" style="display:inline-block;background:#1b66ff;color:#fff;text-decoration:none;font-weight:700;border-radius:9px;padding:12px 18px;">Open Bookful dashboard</a>
+      </p>
+      <p style="font-size:12px;color:#71819c;margin-bottom:0;">For privacy, student names and checkout details remain inside Bookful. You can change or disable reports from Email Reports.</p>
+    </div>
+  </div>
+</body>
+</html>
