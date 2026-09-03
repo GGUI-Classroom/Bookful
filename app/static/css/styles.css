@@ -541,6 +541,72 @@ body {
   background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
 }
 
+.popup-announcement-card,
+.popup-announcement-preview {
+  --popup-background: #173b7f;
+  --popup-text: #ffffff;
+  --popup-button: #ffffff;
+  --popup-button-text: #173b7f;
+  background: var(--popup-background);
+  color: var(--popup-text);
+  border: 0;
+  border-radius: 1.15rem;
+  overflow: hidden;
+}
+
+.popup-announcement-preview {
+  padding: 2rem;
+  box-shadow: 0 1rem 2.5rem rgba(17, 39, 84, 0.18);
+}
+
+.popup-announcement-kicker {
+  color: inherit;
+  opacity: 0.75;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.7rem;
+  text-transform: uppercase;
+}
+
+.popup-announcement-message {
+  color: inherit;
+  line-height: 1.65;
+  margin-bottom: 0;
+  white-space: pre-wrap;
+}
+
+.popup-announcement-check .form-check-input {
+  border-color: currentColor;
+}
+
+.popup-announcement-check .form-check-input:checked {
+  background-color: var(--popup-button);
+  border-color: var(--popup-button);
+}
+
+.popup-announcement-button {
+  background: var(--popup-button);
+  border-color: var(--popup-button);
+  color: var(--popup-button-text);
+  font-weight: 800;
+}
+
+.popup-announcement-button:hover,
+.popup-announcement-button:focus {
+  background: var(--popup-button);
+  border-color: var(--popup-button);
+  color: var(--popup-button-text);
+  filter: brightness(0.94);
+}
+
+.popup-announcement-button:disabled {
+  background: var(--popup-button);
+  border-color: var(--popup-button);
+  color: var(--popup-button-text);
+  opacity: 0.45;
+}
+
 @media (max-width: 991.98px) {
   .guide-grid {
     grid-template-columns: 1fr;

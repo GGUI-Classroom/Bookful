@@ -137,6 +137,34 @@ class BroadcastReportForm(FlaskForm):
     submit = SubmitField("Send to everyone")
 
 
+class PopupAnnouncementForm(FlaskForm):
+    title = StringField("Popup title", validators=[DataRequired(), Length(min=3, max=120)])
+    message = TextAreaField("Popup message", validators=[DataRequired(), Length(min=10, max=5000)])
+    background_color = StringField(
+        "Background color",
+        validators=[DataRequired(), Regexp(r"^#[0-9A-Fa-f]{6}$", message="Use a six-digit hex color, such as #173B7F.")],
+        default="#173B7F",
+    )
+    text_color = StringField(
+        "Text color",
+        validators=[DataRequired(), Regexp(r"^#[0-9A-Fa-f]{6}$", message="Use a six-digit hex color, such as #FFFFFF.")],
+        default="#FFFFFF",
+    )
+    button_color = StringField(
+        "Button color",
+        validators=[DataRequired(), Regexp(r"^#[0-9A-Fa-f]{6}$", message="Use a six-digit hex color, such as #FFFFFF.")],
+        default="#FFFFFF",
+    )
+    button_text_color = StringField(
+        "Button text color",
+        validators=[DataRequired(), Regexp(r"^#[0-9A-Fa-f]{6}$", message="Use a six-digit hex color, such as #173B7F.")],
+        default="#173B7F",
+    )
+    password = PasswordField("Confirm your Bookful password", validators=[DataRequired(), Length(max=128)])
+    is_active = BooleanField("Show this popup to everyone who opens Bookful", default=True)
+    submit = SubmitField("Save popup announcement")
+
+
 class StudentForm(FlaskForm):
     name = StringField("Student Name", validators=[DataRequired(), Length(max=120)])
     classroom_id = SelectField("Classroom", coerce=int, default=0)

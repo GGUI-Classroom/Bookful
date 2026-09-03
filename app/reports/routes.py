@@ -2,13 +2,19 @@ import secrets
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 
-from flask import abort, current_app, flash, jsonify, redirect, render_template, request, url_for
+from flask import abort, current_app, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError
 
 from app.extensions import csrf, db
-from app.forms import BroadcastReportForm, WeeklyReportSettingsForm
-from app.models import BroadcastMessage, Teacher, TestReportDelivery
+from app.forms import BroadcastReportForm, PopupAnnouncementForm, WeeklyReportSettingsForm
+from app.models import (
+    BroadcastMessage,
+    PopupAnnouncement,
+    PopupAnnouncementAcknowledgement,
+    Teacher,
+    TestReportDelivery,
+)
 from app.reports import reports_bp
 from app.reports.service import (
     EmailConfigurationError,
@@ -42,7 +48,33 @@ def broadcast_admin_required(view):
 
 @reports_bp.app_context_processor
 def inject_broadcast_permissions():
-    return {"can_send_broadcasts": is_broadcast_admin(current_user)}
+    if request.endpoint == "reports.popup_announcement":
+        return {
+            "can_send_broadcasts": is_broadcast_admin(current_user),
+            "active_popup_announcement": None,
+        }
+
+    announcement = (
+        PopupAnnouncement.query.filter_by(is_active=True)
+        .order_by(PopupAnnouncement.updated_at.desc(), PopupAnnouncement.id.desc())
+        .first()
+    )
+    if announcement and current_user.is_authenticated:
+        acknowledged = (
+            PopupAnnouncementAcknowledgement.query.filter_by(
+                announcement_id=announcement.id,
+                announcement_version=announcement.version,
+                teacher_id=current_user.id,
+            ).first()
+            is not None
+        )
+    else:
+        acknowledged = session.get("popup_announcement_acknowledged") == f"{announcement.id}:{announcement.version}" if announcement else True
+
+    return {
+        "can_send_broadcasts": is_broadcast_admin(current_user),
+        "active_popup_announcement": announcement if announcement and not acknowledged else None,
+    }
 
 
 @reports_bp.route("/settings", methods=["GET", "POST"])
@@ -165,6 +197,75 @@ def broadcast():
         return redirect(url_for("reports.broadcast"))
 
     return render_template("reports/broadcast.html", form=form, recipient_count=recipient_count)
+
+
+@reports_bp.route("/popup-announcement", methods=["GET", "POST"])
+@login_required
+@broadcast_admin_required
+def popup_announcement():
+    announcement = PopupAnnouncement.query.order_by(PopupAnnouncement.updated_at.desc(), PopupAnnouncement.id.desc()).first()
+    form = PopupAnnouncementForm(obj=announcement)
+
+    if form.validate_on_submit():
+        if not current_user.check_password(form.password.data):
+            form.password.errors.append("Your Bookful password is incorrect.")
+            return render_template("reports/popup_announcement.html", form=form, announcement=announcement)
+
+        if announcement is None:
+            announcement = PopupAnnouncement(created_by_teacher_id=current_user.id)
+            db.session.add(announcement)
+        else:
+            announcement.version += 1
+
+        announcement.title = form.title.data.strip()
+        announcement.message = form.message.data.strip()
+        announcement.background_color = form.background_color.data.upper()
+        announcement.text_color = form.text_color.data.upper()
+        announcement.button_color = form.button_color.data.upper()
+        announcement.button_text_color = form.button_text_color.data.upper()
+        announcement.is_active = form.is_active.data
+        db.session.commit()
+
+        if announcement.is_active:
+            flash("Popup announcement saved. Everyone must acknowledge this new version.", "success")
+        else:
+            flash("Popup announcement saved and turned off.", "success")
+        return redirect(url_for("reports.popup_announcement"))
+
+    return render_template("reports/popup_announcement.html", form=form, announcement=announcement)
+
+
+@reports_bp.post("/popup-announcement/<int:announcement_id>/acknowledge")
+def acknowledge_popup_announcement(announcement_id: int):
+    announcement = db.session.get(PopupAnnouncement, announcement_id)
+    version = request.form.get("version", type=int)
+    if announcement is None or not announcement.is_active or version != announcement.version:
+        abort(404)
+    if request.form.get("acknowledge") != "yes":
+        flash("Check the acknowledgement box before continuing.", "warning")
+    elif current_user.is_authenticated:
+        existing = PopupAnnouncementAcknowledgement.query.filter_by(
+            announcement_id=announcement.id,
+            announcement_version=announcement.version,
+            teacher_id=current_user.id,
+        ).first()
+        if existing is None:
+            db.session.add(
+                PopupAnnouncementAcknowledgement(
+                    announcement_id=announcement.id,
+                    announcement_version=announcement.version,
+                    teacher_id=current_user.id,
+                )
+            )
+            db.session.commit()
+    else:
+        session["popup_announcement_acknowledged"] = f"{announcement.id}:{announcement.version}"
+
+    if session.get("student_portal_account_id"):
+        return redirect(url_for("portal.dashboard"))
+    if current_user.is_authenticated:
+        return redirect(url_for("main.dashboard"))
+    return redirect(url_for("main.home"))
 
 
 @reports_bp.post("/tasks/send-weekly")

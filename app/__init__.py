@@ -2,7 +2,7 @@ from flask import Flask
 from sqlalchemy import inspect, text
 
 from app.extensions import csrf, db, login_manager, migrate
-from app.models import Classroom, StudentAccount
+from app.models import Classroom, PopupAnnouncement, PopupAnnouncementAcknowledgement, StudentAccount
 
 
 def _ensure_schema_compatibility() -> None:
@@ -108,6 +108,10 @@ def _ensure_schema_compatibility() -> None:
 
     if "student_account" not in tables:
         StudentAccount.__table__.create(bind=db.engine, checkfirst=True)
+    if "popup_announcement" not in tables:
+        PopupAnnouncement.__table__.create(bind=db.engine, checkfirst=True)
+    if "popup_announcement_acknowledgement" not in tables:
+        PopupAnnouncementAcknowledgement.__table__.create(bind=db.engine, checkfirst=True)
 
     index_statements = [
         "CREATE INDEX IF NOT EXISTS ix_student_teacher_archived_name ON student (teacher_id, is_archived, name)",

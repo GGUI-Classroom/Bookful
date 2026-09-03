@@ -130,6 +130,42 @@ class BroadcastMessage(db.Model):
     sent_by = db.relationship("Teacher", backref="broadcast_messages")
 
 
+class PopupAnnouncement(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    created_by_teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"), nullable=False, index=True)
+    title = db.Column(db.String(120), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    background_color = db.Column(db.String(7), nullable=False, default="#173b7f")
+    text_color = db.Column(db.String(7), nullable=False, default="#ffffff")
+    button_color = db.Column(db.String(7), nullable=False, default="#ffffff")
+    button_text_color = db.Column(db.String(7), nullable=False, default="#173b7f")
+    is_active = db.Column(db.Boolean, nullable=False, default=True, index=True)
+    version = db.Column(db.Integer, nullable=False, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    created_by = db.relationship("Teacher", backref="popup_announcements")
+
+
+class PopupAnnouncementAcknowledgement(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    announcement_id = db.Column(db.Integer, db.ForeignKey("popup_announcement.id"), nullable=False, index=True)
+    announcement_version = db.Column(db.Integer, nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"), nullable=False, index=True)
+    acknowledged_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    announcement = db.relationship("PopupAnnouncement", backref="acknowledgements")
+    teacher = db.relationship("Teacher", backref="popup_announcement_acknowledgements")
+    __table_args__ = (
+        db.UniqueConstraint(
+            "announcement_id",
+            "announcement_version",
+            "teacher_id",
+            name="uq_popup_announcement_acknowledgement",
+        ),
+    )
+
+
 class TestReportDelivery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"), nullable=False, index=True)

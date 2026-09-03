@@ -57,6 +57,7 @@
                 {% if can_send_broadcasts %}
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="{{ url_for('reports.broadcast') }}">Send announcement</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('reports.popup_announcement') }}">Popup announcement</a></li>
                 {% endif %}
               </ul>
             </li>
@@ -101,7 +102,41 @@
     {% block content %}{% endblock %}
   </main>
 
+  {% if active_popup_announcement %}
+    <div class="modal fade popup-announcement-modal" id="popupAnnouncement" tabindex="-1" aria-labelledby="popupAnnouncementTitle" aria-modal="true" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content popup-announcement-card" style="--popup-background: {{ active_popup_announcement.background_color }}; --popup-text: {{ active_popup_announcement.text_color }}; --popup-button: {{ active_popup_announcement.button_color }}; --popup-button-text: {{ active_popup_announcement.button_text_color }};">
+          <div class="modal-body p-4 p-sm-5">
+            <p class="popup-announcement-kicker">Bookful announcement</p>
+            <h1 class="h3 mb-3" id="popupAnnouncementTitle">{{ active_popup_announcement.title }}</h1>
+            <p class="popup-announcement-message">{{ active_popup_announcement.message }}</p>
+            <form method="post" action="{{ url_for('reports.acknowledge_popup_announcement', announcement_id=active_popup_announcement.id) }}" class="mt-4">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="version" value="{{ active_popup_announcement.version }}">
+              <div class="form-check popup-announcement-check mb-3">
+                <input class="form-check-input" type="checkbox" value="yes" name="acknowledge" id="popupAnnouncementAcknowledge" required>
+                <label class="form-check-label" for="popupAnnouncementAcknowledge">I acknowledge this announcement.</label>
+              </div>
+              <button class="btn popup-announcement-button w-100" type="submit" id="popupAnnouncementSubmit" disabled>Continue to Bookful</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  {% if active_popup_announcement %}
+    <script>
+      (() => {
+        const modalElement = document.getElementById("popupAnnouncement");
+        const checkbox = document.getElementById("popupAnnouncementAcknowledge");
+        const submit = document.getElementById("popupAnnouncementSubmit");
+        new bootstrap.Modal(modalElement).show();
+        checkbox.addEventListener("change", () => { submit.disabled = !checkbox.checked; });
+      })();
+    </script>
+  {% endif %}
   {% block scripts %}{% endblock %}
 </body>
 </html>

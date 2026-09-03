@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Popup Announcement | Bookful{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-xl-7">
+    <div class="mb-4">
+      <span class="badge text-bg-danger mb-2">Administrator only</span>
+      <h1 class="h3 mb-1">Popup announcement</h1>
+      <p class="text-muted mb-0">Show an acknowledgement popup the next time anyone opens Bookful. Saving a new version asks everyone to acknowledge it again.</p>
+    </div>
+    <div class="card border-0 shadow-sm"><div class="card-body p-4">
+      <form method="post" id="popupAnnouncementForm">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.title.label(class="form-label") }}
+          {{ form.title(class="form-control", placeholder="Example: Scheduled maintenance") }}
+          {% for error in form.title.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.message.label(class="form-label") }}
+          {{ form.message(class="form-control", rows="7", placeholder="Explain what is happening and what people need to know.") }}
+          <div class="form-text">Plain text only. Line breaks are preserved in the popup.</div>
+          {% for error in form.message.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="row g-3 mb-4">
+          {% for field in [form.background_color, form.text_color, form.button_color, form.button_text_color] %}
+            <div class="col-md-6">
+              {{ field.label(class="form-label") }}
+              <div class="input-group">
+                <input class="form-control form-control-color popup-color-picker" type="color" value="{{ field.data or field.default }}" data-color-target="{{ field.id }}" aria-label="Choose {{ field.label.text|lower }}">
+                {{ field(class="form-control") }}
+              </div>
+              {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+        <div class="form-check mb-3">
+          {{ form.is_active(class="form-check-input") }}
+          {{ form.is_active.label(class="form-check-label") }}
+        </div>
+        <div class="alert alert-warning mb-3">
+          {{ form.password.label(class="form-label") }}
+          {{ form.password(class="form-control", autocomplete="current-password") }}
+          {% for error in form.password.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+        </div>
+        {{ form.submit(class="btn btn-danger") }}
+      </form>
+    </div></div>
+  </div>
+  <div class="col-xl-5"><div class="position-sticky" style="top: 1rem;">
+    <p class="small text-uppercase fw-bold text-muted mb-2">Live preview</p>
+    <div class="popup-announcement-preview" id="popupPreview">
+      <p class="popup-announcement-kicker">Bookful announcement</p>
+      <h2 class="h4 mb-3" id="previewTitle">Your popup title</h2>
+      <p class="popup-announcement-message" id="previewMessage">Your announcement will appear here.</p>
+      <label class="d-flex gap-2 align-items-start mb-3"><input type="checkbox" disabled> <span>I acknowledge this announcement.</span></label>
+      <button class="btn popup-announcement-button w-100" type="button">Continue to Bookful</button>
+    </div>
+  </div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  (() => {
+    const preview = document.getElementById("popupPreview");
+    const title = document.getElementById("title");
+    const message = document.getElementById("message");
+    const colors = {background_color: "--popup-background", text_color: "--popup-text", button_color: "--popup-button", button_text_color: "--popup-button-text"};
+    const updatePreview = () => {
+      document.getElementById("previewTitle").textContent = title.value || "Your popup title";
+      document.getElementById("previewMessage").textContent = message.value || "Your announcement will appear here.";
+      Object.entries(colors).forEach(([fieldId, property]) => {
+        const field = document.getElementById(fieldId);
+        if (/^#[0-9a-f]{6}$/i.test(field.value)) preview.style.setProperty(property, field.value);
+      });
+    };
+    [title, message, ...Object.keys(colors).map((id) => document.getElementById(id))].forEach((field) => field.addEventListener("input", updatePreview));
+    document.querySelectorAll(".popup-color-picker").forEach((picker) => picker.addEventListener("input", () => {
+      document.getElementById(picker.dataset.colorTarget).value = picker.value.toUpperCase();
+      updatePreview();
+    }));
+    updatePreview();
+  })();
+</script>
+{% endblock %}

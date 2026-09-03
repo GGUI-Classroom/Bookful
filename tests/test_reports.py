@@ -4,7 +4,16 @@ from unittest.mock import patch
 
 from app import create_app
 from app.extensions import db
-from app.models import Book, BroadcastMessage, CheckoutRecord, Student, Teacher, TestReportDelivery
+from app.models import (
+    Book,
+    BroadcastMessage,
+    CheckoutRecord,
+    PopupAnnouncement,
+    PopupAnnouncementAcknowledgement,
+    Student,
+    Teacher,
+    TestReportDelivery,
+)
 from app.reports.service import (
     build_weekly_report_summary,
     is_weekly_report_due,
@@ -188,6 +197,47 @@ class ReportsTestCase(unittest.TestCase):
 
         navigation = self.client.get("/dashboard")
         self.assertIn(b"Send announcement", navigation.data)
+
+    def test_regular_teacher_cannot_manage_popup_announcement(self):
+        response = self.client.get("/reports/popup-announcement")
+        self.assertEqual(response.status_code, 403)
+
+    def test_admin_can_publish_and_teacher_must_acknowledge_popup(self):
+        admin = self._create_and_login_admin()
+        response = self.client.post(
+            "/reports/popup-announcement",
+            data={
+                "title": "Scheduled maintenance",
+                "message": "Bookful will be unavailable tonight at 9 PM.",
+                "background_color": "#173B7F",
+                "text_color": "#FFFFFF",
+                "button_color": "#FFFFFF",
+                "button_text_color": "#173B7F",
+                "is_active": "y",
+                "password": "admin-password-123",
+            },
+            follow_redirects=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        announcement = PopupAnnouncement.query.one()
+        self.assertTrue(announcement.is_active)
+        self.assertEqual(announcement.created_by_teacher_id, admin.id)
+
+        with self.client.session_transaction() as session:
+            session["_user_id"] = str(self.teacher.id)
+            session["_fresh"] = True
+        response = self.client.get("/dashboard")
+        self.assertIn(b"Scheduled maintenance", response.data)
+        self.assertIn(b"I acknowledge this announcement.", response.data)
+
+        response = self.client.post(
+            f"/reports/popup-announcement/{announcement.id}/acknowledge",
+            data={"version": announcement.version, "acknowledge": "yes"},
+            follow_redirects=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(PopupAnnouncementAcknowledgement.query.count(), 1)
+        self.assertNotIn(b"I acknowledge this announcement.", response.data)
 
     @patch("app.reports.routes.send_broadcast_email", return_value="gmail-message-id")
     def test_broadcast_requires_admin_password(self, mocked_send):
