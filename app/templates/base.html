@@ -16,9 +16,9 @@
   <nav class="navbar navbar-expand-lg navbar-dark app-nav">
     {% if selected_theme == 'manatees' %}
       <div class="manatee-pod" aria-hidden="true">
-        {% for swimmer in range(8) %}
-          <img class="manatee-swimmer" src="{{ url_for('static', filename='images/manatee-swimmer.png') }}" alt="">
-        {% endfor %}
+        <img class="manatee-swimmer swimmer-left" src="{{ url_for('static', filename='images/manatee-swimmer.png') }}" alt="">
+        <img class="manatee-swimmer swimmer-center" src="{{ url_for('static', filename='images/manatee-swimmer.png') }}" alt="">
+        <img class="manatee-swimmer swimmer-right" src="{{ url_for('static', filename='images/manatee-swimmer.png') }}" alt="">
       </div>
     {% endif %}
     <div class="container">

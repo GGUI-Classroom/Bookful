@@ -76,38 +76,12 @@ body {
   z-index: 20;
 }
 
-.manatee-pod {
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  position: absolute;
-  z-index: 0;
-}
-
-.theme-manatees .app-nav > .container {
-  position: relative;
-  z-index: 1;
-}
-
-.manatee-swimmer {
-  animation: manatee-swim 7s ease-in-out infinite;
-  height: 3.65rem;
-  object-fit: contain;
-  opacity: 0.72;
-  position: absolute;
-  top: 0.1rem;
-  transform-origin: center;
-  width: 7rem;
-}
-
-.manatee-swimmer:nth-child(1) { animation-delay: -1.6s; animation-duration: 6.4s; left: 2%; }
-.manatee-swimmer:nth-child(2) { animation-delay: -4.1s; animation-duration: 8s; left: 16%; top: 0.6rem; width: 5.6rem; }
-.manatee-swimmer:nth-child(3) { animation-delay: -2.8s; animation-duration: 7.1s; left: 29%; top: -0.3rem; width: 6.3rem; }
-.manatee-swimmer:nth-child(4) { animation-delay: -5.4s; animation-duration: 8.5s; left: 42%; top: 0.7rem; width: 5rem; }
-.manatee-swimmer:nth-child(5) { animation-delay: -0.8s; animation-duration: 6.8s; left: 54%; top: -0.25rem; width: 6.8rem; }
-.manatee-swimmer:nth-child(6) { animation-delay: -3.5s; animation-duration: 7.6s; left: 68%; top: 0.6rem; width: 5.4rem; }
-.manatee-swimmer:nth-child(7) { animation-delay: -6.1s; animation-duration: 8.2s; left: 78%; top: -0.35rem; width: 6.2rem; }
-.manatee-swimmer:nth-child(8) { animation-delay: -2.2s; animation-duration: 6.6s; left: 90%; top: 0.55rem; width: 5rem; }
+.manatee-pod { inset: 0; overflow: hidden; pointer-events: none; position: absolute; z-index: 0; }
+.theme-manatees .app-nav > .container { position: relative; z-index: 1; }
+.manatee-swimmer { animation: manatee-swim 9s ease-in-out infinite; height: 4.1rem; object-fit: contain; opacity: 0.44; position: absolute; top: 0.08rem; transform-origin: center; width: 8.2rem; }
+.swimmer-left { animation-delay: -2.2s; left: 3%; }
+.swimmer-center { animation-delay: -6.1s; animation-duration: 11s; left: 45%; top: 0.55rem; width: 6rem; }
+.swimmer-right { animation-delay: -4.4s; animation-duration: 8s; right: 4%; top: -0.32rem; width: 7.1rem; }
 
 .theme-manatees .dashboard-hero,
 .theme-manatees .search-hero,
@@ -125,11 +99,63 @@ body {
   box-shadow: 0 4px 15px rgba(9, 133, 135, 0.28);
 }
 
+.theme-manatees main {
+  background-image:
+    radial-gradient(circle at 7% 20%, rgba(32, 159, 157, 0.11) 0 0.16rem, transparent 0.2rem),
+    radial-gradient(circle at 94% 40%, rgba(32, 159, 157, 0.1) 0 0.22rem, transparent 0.27rem),
+    radial-gradient(circle at 20% 88%, rgba(32, 159, 157, 0.08) 0 0.12rem, transparent 0.17rem);
+}
+
+.theme-manatees .card,
+.theme-manatees .dashboard-stat,
+.theme-manatees .guide-card {
+  border-color: #bfe8dc;
+  box-shadow: 0 10px 24px rgba(8, 112, 110, 0.09);
+}
+
+.theme-manatees .dashboard-hero,
+.theme-manatees .search-hero,
+.theme-manatees .guide-hero {
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+}
+
+.theme-manatees .dashboard-hero::after,
+.theme-manatees .search-hero::after,
+.theme-manatees .guide-hero::after {
+  background: linear-gradient(90deg, rgba(5, 99, 108, 0.1) 0%, rgba(5, 99, 108, 0.42) 100%), url("../images/manatee-underwater.jpg") center 48% / cover no-repeat;
+  content: "";
+  inset: 0;
+  opacity: 0.48;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.theme-manatees .dashboard-hero::before,
+.theme-manatees .search-hero::before,
+.theme-manatees .guide-hero::before {
+  background: linear-gradient(115deg, transparent 0 34%, rgba(218, 255, 249, 0.2) 35% 39%, transparent 40% 58%, rgba(218, 255, 249, 0.12) 59% 63%, transparent 64%), radial-gradient(circle, rgba(225, 255, 247, 0.7) 0 0.2rem, transparent 0.25rem) 65% 30% / 2.6rem 2.6rem;
+  content: "";
+  inset: 0;
+  opacity: 0.36;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.theme-manatees .dashboard-hero > *,
+.theme-manatees .search-hero > *,
+.theme-manatees .guide-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
 @keyframes manatee-swim {
-  0%, 100% { transform: translate3d(-0.7rem, 0.15rem, 0) rotate(-3deg); }
-  25% { transform: translate3d(0.45rem, -0.28rem, 0) rotate(3deg); }
-  50% { transform: translate3d(1rem, 0.12rem, 0) rotate(-2deg); }
-  75% { transform: translate3d(0.2rem, 0.36rem, 0) rotate(2deg); }
+  0%, 100% { transform: translate3d(-0.6rem, 0.08rem, 0) rotate(-2deg); }
+  30% { transform: translate3d(0.4rem, -0.22rem, 0) rotate(2deg); }
+  65% { transform: translate3d(0.85rem, 0.18rem, 0) rotate(-1deg); }
 }
 
 .themes-hero {
@@ -177,13 +203,11 @@ body {
 
 .theme-option-preview span { font-size: 1.25rem; font-weight: 800; margin-right: auto; position: relative; z-index: 1; }
 .theme-option-preview i { background: rgba(255, 255, 255, 0.23); border-radius: 999px; height: 0.6rem; width: 1.8rem; }
-.theme-option-manatees .theme-option-preview::after { background: url("../images/manatee-swimmer.png") center/auto 105px repeat-x; content: ""; inset: 0; opacity: 0.56; position: absolute; }
+.theme-option-manatees .theme-option-preview::after { background: linear-gradient(90deg, rgba(7, 93, 106, 0.1), rgba(7, 93, 106, 0.45)), url("../images/manatee-underwater.jpg") center / cover; content: ""; inset: 0; opacity: 0.82; position: absolute; }
 .theme-option-red.is-selected { border-color: #c72d49; }
 .theme-option-manatees.is-selected { border-color: #098587; }
 
-@media (prefers-reduced-motion: reduce) {
-  .manatee-swimmer { animation: none; }
-}
+@media (prefers-reduced-motion: reduce) { .manatee-swimmer { animation: none; } }
 
 .app-nav .navbar-brand {
   margin-right: 1.75rem;
