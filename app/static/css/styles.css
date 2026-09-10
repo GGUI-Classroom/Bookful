@@ -25,6 +25,151 @@ body {
   letter-spacing: 0.2px;
 }
 
+/* Account-selected color systems keep Bookful Blue as the unmodified default. */
+.theme-red {
+  background:
+    radial-gradient(1000px 350px at 0% -5%, rgba(255, 96, 104, 0.15), transparent 60%),
+    radial-gradient(800px 300px at 100% -10%, rgba(255, 174, 84, 0.16), transparent 65%),
+    #fff8f6;
+}
+
+.theme-red .app-nav,
+.theme-option-red .theme-option-preview {
+  background: linear-gradient(105deg, #74172a 0%, #b72946 55%, #f05f56 100%);
+}
+
+.theme-red .btn-primary,
+.theme-red .dashboard-kicker,
+.theme-red .guide-step {
+  background-color: #bc2947;
+  border-color: #bc2947;
+  color: #fff;
+}
+
+.theme-red .dashboard-hero,
+.theme-red .search-hero,
+.theme-red .guide-hero {
+  background: radial-gradient(circle at 92% 5%, rgba(255, 199, 130, 0.32), transparent 18rem), linear-gradient(135deg, #75182d, #bf2947 68%, #ef695b);
+}
+
+.theme-red .btn-checkout {
+  background: linear-gradient(135deg, #ff9a6c, #c72d49);
+  box-shadow: 0 4px 15px rgba(191, 41, 71, 0.28);
+}
+
+.theme-manatees {
+  background:
+    radial-gradient(1000px 350px at 0% -5%, rgba(64, 205, 194, 0.2), transparent 60%),
+    radial-gradient(800px 300px at 100% -10%, rgba(146, 229, 204, 0.24), transparent 65%),
+    #f4fbf8;
+}
+
+.theme-manatees .app-nav,
+.theme-option-manatees .theme-option-preview {
+  background: linear-gradient(100deg, #075d6a 0%, #0e8a8c 55%, #39bda9 100%);
+}
+
+.theme-manatees .app-nav {
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+}
+
+.theme-manatees .app-nav::after {
+  animation: manatee-swim 32s linear infinite;
+  background-image: url("../images/manatee-swim-strip.png");
+  background-position: center;
+  background-repeat: repeat-x;
+  background-size: auto 82px;
+  content: "";
+  inset: 0;
+  opacity: 0.42;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(0);
+  width: 200%;
+  z-index: -1;
+}
+
+.theme-manatees .app-nav > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.theme-manatees .dashboard-hero,
+.theme-manatees .search-hero,
+.theme-manatees .guide-hero {
+  background: radial-gradient(circle at 92% 5%, rgba(184, 255, 222, 0.34), transparent 18rem), linear-gradient(135deg, #05636c, #108f8e 66%, #4ac5a7);
+}
+
+.theme-manatees .btn-primary {
+  background: #098587;
+  border-color: #098587;
+}
+
+.theme-manatees .btn-checkout {
+  background: linear-gradient(135deg, #55cdb3, #098587);
+  box-shadow: 0 4px 15px rgba(9, 133, 135, 0.28);
+}
+
+@keyframes manatee-swim {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.themes-hero {
+  border-radius: 1.2rem;
+  background: radial-gradient(circle at 88% 20%, rgba(159, 237, 255, 0.5), transparent 17rem), linear-gradient(135deg, #102c65, #246be0);
+  color: #fff;
+  padding: clamp(1.6rem, 4vw, 2.5rem);
+}
+
+.themes-kicker {
+  color: #9cefff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+}
+
+.themes-hero h1 { font-weight: 800; margin-bottom: 0.45rem; }
+.themes-hero p:last-child { color: rgba(255, 255, 255, 0.86); margin: 0; }
+
+.theme-option {
+  background: #fff;
+  border: 1px solid #dce7f5;
+  border-radius: 1rem;
+  box-shadow: 0 10px 24px rgba(20, 61, 120, 0.08);
+  height: 100%;
+  overflow: hidden;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.theme-option:hover { transform: translateY(-4px); box-shadow: 0 16px 30px rgba(20, 61, 120, 0.14); }
+.theme-option.is-selected { border: 3px solid #246be0; }
+.theme-option-preview {
+  align-items: center;
+  background: linear-gradient(100deg, #0d2f74, #2672ff);
+  color: #fff;
+  display: flex;
+  gap: 0.35rem;
+  height: 8.75rem;
+  overflow: hidden;
+  padding: 1.25rem;
+  position: relative;
+}
+
+.theme-option-preview span { font-size: 1.25rem; font-weight: 800; margin-right: auto; position: relative; z-index: 1; }
+.theme-option-preview i { background: rgba(255, 255, 255, 0.23); border-radius: 999px; height: 0.6rem; width: 1.8rem; }
+.theme-option-manatees .theme-option-preview::after { background: url("../images/manatee-swim-strip.png") center/auto 120px repeat-x; content: ""; inset: 0; opacity: 0.56; position: absolute; }
+.theme-option-red.is-selected { border-color: #c72d49; }
+.theme-option-manatees.is-selected { border-color: #098587; }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-manatees .app-nav::after { animation: none; }
+}
+
 .app-nav .navbar-brand {
   margin-right: 1.75rem;
 }

@@ -62,6 +62,10 @@ def _ensure_schema_compatibility() -> None:
             )
         if "weekly_report_last_sent_at" not in teacher_columns:
             db.session.execute(text(f"ALTER TABLE teacher ADD COLUMN weekly_report_last_sent_at {timestamp_type}"))
+        if "theme" not in teacher_columns:
+            db.session.execute(
+                text("ALTER TABLE teacher ADD COLUMN theme VARCHAR(30) NOT NULL DEFAULT 'bookful-blue'")
+            )
 
     if "classroom" not in tables:
         Classroom.__table__.create(bind=db.engine, checkfirst=True)

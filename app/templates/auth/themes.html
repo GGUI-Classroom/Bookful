@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Themes | Bookful{% endblock %}
+{% block content %}
+<section class="themes-hero mb-4">
+  <p class="themes-kicker">Make Bookful yours</p>
+  <h1>Choose your theme</h1>
+  <p>Your choice is saved to your account and follows you wherever you sign in.</p>
+</section>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <article class="theme-option theme-option-blue {{ 'is-selected' if current_user.theme == 'bookful-blue' else '' }}">
+      <div class="theme-option-preview"><span>Bookful</span><i></i><i></i><i></i></div>
+      <div class="p-4">
+        <h2 class="h4">Bookful Blue</h2>
+        <p class="text-muted">The familiar Bookful look, with its bright blue library energy.</p>
+        <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="theme" value="bookful-blue"><button class="btn btn-primary w-100" type="submit">{{ 'Currently selected' if current_user.theme == 'bookful-blue' else 'Use Bookful Blue' }}</button></form>
+      </div>
+    </article>
+  </div>
+  <div class="col-lg-4">
+    <article class="theme-option theme-option-red {{ 'is-selected' if current_user.theme == 'red' else '' }}">
+      <div class="theme-option-preview"><span>Bookful</span><i></i><i></i><i></i></div>
+      <div class="p-4">
+        <h2 class="h4">Red</h2>
+        <p class="text-muted">The same expressive gradient style, turned up with warm coral and crimson.</p>
+        <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="theme" value="red"><button class="btn btn-danger w-100" type="submit">{{ 'Currently selected' if current_user.theme == 'red' else 'Use Red' }}</button></form>
+      </div>
+    </article>
+  </div>
+  <div class="col-lg-4">
+    <article class="theme-option theme-option-manatees {{ 'is-selected' if current_user.theme == 'manatees' else '' }}">
+      <div class="theme-option-preview"><span>Bookful</span><i></i><i></i><i></i></div>
+      <div class="p-4">
+        <h2 class="h4">Manatees</h2>
+        <p class="text-muted">A calm lagoon theme with a little manatee pod swimming across the top.</p>
+        <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="theme" value="manatees"><button class="btn btn-success w-100" type="submit">{{ 'Currently selected' if current_user.theme == 'manatees' else 'Swim with manatees' }}</button></form>
+      </div>
+    </article>
+  </div>
+</div>
+{% endblock %}

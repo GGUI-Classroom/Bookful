@@ -11,7 +11,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
 </head>
-<body>
+{% set selected_theme = current_user.theme if current_user.is_authenticated and current_user.theme in ['bookful-blue', 'red', 'manatees'] else 'bookful-blue' %}
+<body class="theme-{{ selected_theme }}">
   <nav class="navbar navbar-expand-lg navbar-dark app-nav">
     <div class="container">
       <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{{ url_for('portal.dashboard') if student_portal_active else (url_for('main.dashboard') if current_user.is_authenticated else url_for('main.home')) }}">
@@ -68,6 +69,7 @@
               <button class="btn nav-account dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ current_user.username }}</button>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" href="{{ url_for('auth.account') }}">Account &amp; security</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('auth.themes') }}">Themes</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('reports.settings') }}">Email report settings</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('main.how_to_use') }}">How to use Bookful</a></li>
                 <li><hr class="dropdown-divider"></li>

@@ -37,6 +37,7 @@ VERIFICATION_MAX_ATTEMPTS = 5
 PASSWORD_RESET_CODE_TTL_MINUTES = 15
 PASSWORD_RESET_COOLDOWN_SECONDS = 60
 PASSWORD_RESET_MAX_ATTEMPTS = 5
+AVAILABLE_THEMES = {"bookful-blue", "red", "manatees"}
 
 
 def _utc_now() -> datetime:
@@ -335,6 +336,22 @@ def _render_account(change_form=None, delete_form=None):
 @login_required
 def account():
     return _render_account()
+
+
+@auth_bp.route("/themes", methods=["GET", "POST"])
+@login_required
+def themes():
+    if request.method == "POST":
+        selected_theme = request.form.get("theme", "")
+        if selected_theme not in AVAILABLE_THEMES:
+            flash("That theme is not available.", "danger")
+        else:
+            current_user.theme = selected_theme
+            db.session.commit()
+            flash("Your theme has been updated.", "success")
+            return redirect(url_for("auth.themes"))
+
+    return render_template("auth/themes.html", available_themes=AVAILABLE_THEMES)
 
 
 @auth_bp.post("/account/change-password")

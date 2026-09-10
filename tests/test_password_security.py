@@ -47,6 +47,28 @@ class PasswordSecurityTestCase(unittest.TestCase):
             session["_user_id"] = str(teacher.id)
             session["_fresh"] = True
 
+    def test_teacher_can_select_a_persistent_theme(self):
+        teacher = self._teacher()
+        self._login(teacher)
+
+        response = self.client.post("/auth/themes", data={"theme": "manatees"}, follow_redirects=True)
+
+        db.session.refresh(teacher)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(teacher.theme, "manatees")
+        self.assertIn(b"theme-manatees", response.data)
+        self.assertIn(b"Swim with manatees", response.data)
+
+    def test_themes_reject_unknown_values(self):
+        teacher = self._teacher()
+        self._login(teacher)
+
+        response = self.client.post("/auth/themes", data={"theme": "unknown"}, follow_redirects=True)
+
+        db.session.refresh(teacher)
+        self.assertEqual(teacher.theme, "bookful-blue")
+        self.assertIn(b"not available", response.data)
+
     @patch("app.auth.routes.send_password_reset_code", return_value="gmail-message-id")
     @patch("app.auth.routes.secrets.randbelow", return_value=123456)
     def test_forgot_password_emails_hashed_code(self, mocked_random, mocked_send):

@@ -34,6 +34,7 @@ class Teacher(UserMixin, db.Model):
     weekly_report_hour = db.Column(db.Integer, nullable=False, default=8)
     weekly_report_timezone = db.Column(db.String(64), nullable=False, default="America/Los_Angeles")
     weekly_report_last_sent_at = db.Column(db.DateTime, nullable=True)
+    theme = db.Column(db.String(30), nullable=False, default="bookful-blue")
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     students = db.relationship("Student", backref="teacher", lazy="dynamic", cascade="all, delete-orphan")
