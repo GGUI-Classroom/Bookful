@@ -14,6 +14,13 @@
 {% set selected_theme = current_user.theme if current_user.is_authenticated and current_user.theme in ['bookful-blue', 'red', 'manatees'] else 'bookful-blue' %}
 <body class="theme-{{ selected_theme }}">
   <nav class="navbar navbar-expand-lg navbar-dark app-nav">
+    {% if selected_theme == 'manatees' %}
+      <div class="manatee-pod" aria-hidden="true">
+        {% for swimmer in range(8) %}
+          <img class="manatee-swimmer" src="{{ url_for('static', filename='images/manatee-swimmer.png') }}" alt="">
+        {% endfor %}
+      </div>
+    {% endif %}
     <div class="container">
       <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{{ url_for('portal.dashboard') if student_portal_active else (url_for('main.dashboard') if current_user.is_authenticated else url_for('main.home')) }}">
         <img src="{{ url_for('static', filename='images/bookful-logo.svg') }}" alt="Bookful logo" width="30" height="30">
