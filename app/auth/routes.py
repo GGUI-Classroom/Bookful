@@ -348,7 +348,6 @@ def themes():
         else:
             current_user.theme = selected_theme
             db.session.commit()
-            flash("Your theme has been updated.", "success")
             return redirect(url_for("auth.themes"))
 
     return render_template("auth/themes.html", available_themes=AVAILABLE_THEMES)

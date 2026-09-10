@@ -71,7 +71,7 @@ body {
 
 .theme-manatees .app-nav {
   isolation: isolate;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
 }
 
