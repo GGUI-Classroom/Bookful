@@ -73,6 +73,7 @@ body {
   isolation: isolate;
   overflow: visible;
   position: relative;
+  z-index: 20;
 }
 
 .theme-manatees .app-nav::after {
