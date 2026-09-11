@@ -4,13 +4,13 @@
 <section class="landing-hero">
   <div class="landing-copy">
     <p class="landing-kicker">Classroom library</p>
-    <h1 class="landing-title">Keep track of your books.</h1>
-    <p class="landing-subtitle">Add your books and students, then check books in and out.</p>
+    <h1 class="landing-title">Your classroom library, in one place.</h1>
+    <p class="landing-subtitle">Teachers manage books and checkouts. Students can use a class code to see their library.</p>
     <div class="landing-actions">
-      <a class="btn btn-lg btn-landing-primary" href="{{ url_for('auth.signup') }}">Get started</a>
-      <a class="btn btn-lg btn-landing-secondary" href="{{ url_for('auth.login') }}">Log in</a>
+      <a class="btn btn-lg btn-landing-primary" href="{{ url_for('auth.signup') }}">I'm a teacher</a>
+      <a class="btn btn-lg btn-landing-secondary" href="{{ url_for('portal.join_with_code') }}">I have a class code</a>
     </div>
-    <p class="landing-class-code">Have a class code? <a href="{{ url_for('portal.join_with_code') }}">Join here</a></p>
+    <p class="landing-class-code">Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
   </div>
 </section>
 {% endblock %}
