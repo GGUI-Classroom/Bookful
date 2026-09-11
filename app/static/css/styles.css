@@ -453,50 +453,50 @@ body {
   position: relative;
   overflow: hidden;
   border-radius: 1.1rem;
-  padding: 3rem 2rem;
-  background:
-    linear-gradient(140deg, #092252 0%, #15439c 55%, #2c7cff 100%);
+  padding: clamp(2.5rem, 7vw, 5rem);
+  background: linear-gradient(135deg, #0e2f6e, #276fe6);
   color: #fff;
-}
-
-.landing-hero-inner {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  gap: 1.5rem;
-  grid-template-columns: 1.2fr 1fr;
-  align-items: center;
 }
 
 .landing-kicker {
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
   font-weight: 800;
   margin-bottom: 0.5rem;
   color: #90e7ff;
 }
 
 .landing-title {
-  font-size: clamp(2rem, 4vw, 3.5rem);
-  line-height: 1.08;
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  line-height: 1;
   font-weight: 800;
   margin-bottom: 0.9rem;
   text-wrap: balance;
 }
 
 .landing-subtitle {
-  max-width: 44ch;
-  font-size: 1.06rem;
-  line-height: 1.65;
+  max-width: 34ch;
+  font-size: 1.1rem;
+  line-height: 1.5;
   color: rgba(255, 255, 255, 0.9);
 }
 
 .landing-actions {
-  margin-top: 1.4rem;
+  margin-top: 1.6rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+.landing-class-code {
+  color: rgba(255, 255, 255, 0.82);
+  margin: 1.25rem 0 0;
+}
+
+.landing-class-code a {
+  color: #fff;
+  font-weight: 700;
 }
 
 .btn-landing-primary {
