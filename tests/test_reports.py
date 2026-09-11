@@ -239,6 +239,30 @@ class ReportsTestCase(unittest.TestCase):
         self.assertEqual(PopupAnnouncementAcknowledgement.query.count(), 1)
         self.assertNotIn(b"I acknowledge this announcement.", response.data)
 
+    def test_teachers_only_popup_is_not_shown_to_student_portal_sessions(self):
+        self._create_and_login_admin()
+        response = self.client.post(
+            "/reports/popup-announcement",
+            data={
+                "title": "Teacher update",
+                "message": "Teachers need to review this update today.",
+                "background_color": "#173B7F",
+                "text_color": "#FFFFFF",
+                "button_color": "#FFFFFF",
+                "button_text_color": "#173B7F",
+                "audience": "teachers",
+                "is_active": "y",
+                "password": "admin-password-123",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+
+        with self.client.session_transaction() as session:
+            session.pop("_user_id", None)
+            session["student_portal_account_id"] = 1
+        response = self.client.get("/")
+        self.assertNotIn(b"Teacher update", response.data)
+
     @patch("app.reports.routes.send_broadcast_email", return_value="gmail-message-id")
     def test_broadcast_requires_admin_password(self, mocked_send):
         self._create_and_login_admin()

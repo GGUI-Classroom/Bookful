@@ -114,6 +114,12 @@ def _ensure_schema_compatibility() -> None:
         StudentAccount.__table__.create(bind=db.engine, checkfirst=True)
     if "popup_announcement" not in tables:
         PopupAnnouncement.__table__.create(bind=db.engine, checkfirst=True)
+    else:
+        popup_columns = {column["name"] for column in inspector.get_columns("popup_announcement")}
+        if "audience" not in popup_columns:
+            db.session.execute(
+                text("ALTER TABLE popup_announcement ADD COLUMN audience VARCHAR(20) NOT NULL DEFAULT 'everyone'")
+            )
     if "popup_announcement_acknowledgement" not in tables:
         PopupAnnouncementAcknowledgement.__table__.create(bind=db.engine, checkfirst=True)
 

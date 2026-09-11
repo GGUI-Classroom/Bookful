@@ -140,6 +140,7 @@ class PopupAnnouncement(db.Model):
     text_color = db.Column(db.String(7), nullable=False, default="#ffffff")
     button_color = db.Column(db.String(7), nullable=False, default="#ffffff")
     button_text_color = db.Column(db.String(7), nullable=False, default="#173b7f")
+    audience = db.Column(db.String(20), nullable=False, default="everyone")
     is_active = db.Column(db.Boolean, nullable=False, default=True, index=True)
     version = db.Column(db.Integer, nullable=False, default=1)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

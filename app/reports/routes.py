@@ -59,6 +59,8 @@ def inject_broadcast_permissions():
         .order_by(PopupAnnouncement.updated_at.desc(), PopupAnnouncement.id.desc())
         .first()
     )
+    if announcement and announcement.audience == "teachers" and not current_user.is_authenticated:
+        announcement = None
     if announcement and current_user.is_authenticated:
         acknowledged = (
             PopupAnnouncementAcknowledgement.query.filter_by(
@@ -223,11 +225,13 @@ def popup_announcement():
         announcement.text_color = form.text_color.data.upper()
         announcement.button_color = form.button_color.data.upper()
         announcement.button_text_color = form.button_text_color.data.upper()
+        announcement.audience = form.audience.data
         announcement.is_active = form.is_active.data
         db.session.commit()
 
         if announcement.is_active:
-            flash("Popup announcement saved. Everyone must acknowledge this new version.", "success")
+            recipient_label = "Teachers" if announcement.audience == "teachers" else "Everyone"
+            flash(f"Popup announcement saved. {recipient_label} must acknowledge this new version.", "success")
         else:
             flash("Popup announcement saved and turned off.", "success")
         return redirect(url_for("reports.popup_announcement"))

@@ -160,8 +160,14 @@ class PopupAnnouncementForm(FlaskForm):
         validators=[DataRequired(), Regexp(r"^#[0-9A-Fa-f]{6}$", message="Use a six-digit hex color, such as #173B7F.")],
         default="#173B7F",
     )
+    audience = SelectField(
+        "Show to",
+        choices=[("everyone", "Everyone"), ("teachers", "Teachers only")],
+        default="everyone",
+        validators=[DataRequired()],
+    )
     password = PasswordField("Confirm your Bookful password", validators=[DataRequired(), Length(max=128)])
-    is_active = BooleanField("Show this popup to everyone who opens Bookful", default=True)
+    is_active = BooleanField("Show this popup", default=True)
     submit = SubmitField("Save popup announcement")
 
 
